@@ -25,19 +25,16 @@ public class GUI extends JFrame {
 
     // ===== PANELS =====
     private JPanel contentPane;
-    private JScrollPane scrollPane_1; // ROM
-    private JScrollPane scrollPane_2; // RAM
+    private JScrollPane scrollPaneROM;
+    private JScrollPane scrollPaneRAM;
 
     // ===== TABLES =====
-    private JTable table;   // ROM
-    private JTable table_2; // RAM
+    private JTable tableROM;
+    private JTable tableRAM;
 
     // ===== PANEL CPU =====
     private CPUPanel6809 cpuPanel;
 
-    /**
-     * MAIN
-     */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
@@ -49,31 +46,26 @@ public class GUI extends JFrame {
         });
     }
 
-    /**
-     * CONSTRUCTEUR
-     */
     public GUI() {
 
-        // ===== INIT CPU & MEMOIRE =====
+        // === INIT CPU ===
         memory = new Memory();
         cpu = new CPU6809(memory);
         debugger = new Debugger(cpu, memory);
 
-        loadTestProgram(); // Charger un petit programme test
         cpu.reset();
 
-        // ===== FENETRE =====
+        // === FENÊTRE ===
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1308, 882);
 
         contentPane = new JPanel();
         contentPane.setBackground(new Color(255, 210, 210));
-        contentPane.setForeground(new Color(181, 70, 142));
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(null);
         setContentPane(contentPane);
 
-        // ========== ZONE CODE ==========
+        // === ZONE CODE ===
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(0, 23, 216, 444);
         contentPane.add(scrollPane);
@@ -81,44 +73,48 @@ public class GUI extends JFrame {
         JTextArea textArea = new JTextArea();
         scrollPane.setViewportView(textArea);
 
-        // ========== BOUTONS ==========
+        // === BOUTONS ===
         JButton BtnNew = new JButton("New");
         BtnNew.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        BtnNew.setForeground(new Color(128, 55, 95));
         BtnNew.setBounds(0, 0, 64, 20);
         BtnNew.addActionListener(e -> textArea.setText(""));
         contentPane.add(BtnNew);
 
-        JButton btnRam = new JButton("RAM");
-        btnRam.setFont(new Font("Rockwell Condensed", Font.BOLD, 13));
-        btnRam.setForeground(new Color(128, 55, 95));
-        btnRam.setBounds(389, 0, 64, 20);
-        btnRam.addActionListener(e -> {
-            scrollPane_2.setVisible(true);
-            refreshRAM();
-        });
-        contentPane.add(btnRam);
-
         JButton btnRom = new JButton("ROM");
         btnRom.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnRom.setForeground(new Color(128, 55, 95));
         btnRom.setBounds(260, 0, 64, 20);
         btnRom.addActionListener(e -> {
-            scrollPane_1.setVisible(true);
+            scrollPaneROM.setVisible(true);
             refreshROM();
         });
         contentPane.add(btnRom);
 
-        // ======== RUN ========
+        JButton btnRam = new JButton("RAM");
+        btnRam.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
+        btnRam.setBounds(330, 0, 64, 20);
+        btnRam.addActionListener(e -> {
+            scrollPaneRAM.setVisible(true);
+            refreshRAM();
+        });
+        contentPane.add(btnRam);
+        JButton btnAssemble = new JButton("Assemble");
+        btnAssemble.setBounds(190, 0, 80, 20);
+        btnAssemble.addActionListener(e -> {
+            assembleAndLoad(textArea.getText());
+            cpu.reset();           
+            cpuPanel.refresh();
+            refreshROM();
+        });
+
+        contentPane.add(btnAssemble);
+
         JButton btnRun = new JButton("Run");
         btnRun.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnRun.setForeground(new Color(128, 55, 95));
         btnRun.setBounds(505, 0, 64, 20);
         contentPane.add(btnRun);
 
         btnRun.addActionListener(e -> {
-            if (running) return; // déjà en cours
-
+            if (running) return;
             running = true;
 
             worker = new SwingWorker<Void, Void>() {
@@ -137,26 +133,18 @@ public class GUI extends JFrame {
             worker.execute();
         });
 
-        // ======== STOP ========
         JButton btnStop = new JButton("Stop");
         btnStop.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnStop.setForeground(new Color(128, 55, 95));
         btnStop.setBounds(569, 0, 64, 20);
-        contentPane.add(btnStop);
-
         btnStop.addActionListener(e -> {
             running = false;
-            if (worker != null)
-                worker.cancel(true);
+            if (worker != null) worker.cancel(true);
         });
+        contentPane.add(btnStop);
 
-        // ======== PAS A PAS ========
         JButton btnPasPas = new JButton("Pas à pas");
         btnPasPas.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnPasPas.setForeground(new Color(128, 55, 95));
         btnPasPas.setBounds(631, 0, 93, 20);
-        contentPane.add(btnPasPas);
-
         btnPasPas.addActionListener(e -> {
             try {
                 cpu.step();
@@ -167,87 +155,68 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(null, "Erreur CPU : " + ex.getMessage());
             }
         });
+        contentPane.add(btnPasPas);
 
-        // ======== RESET ========
         JButton btnReset = new JButton("Reset");
         btnReset.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnReset.setForeground(new Color(128, 55, 95));
         btnReset.setBounds(722, 0, 80, 20);
-        contentPane.add(btnReset);
-
         btnReset.addActionListener(e -> {
             cpu.reset();
             cpuPanel.refresh();
             refreshRAM();
             refreshROM();
         });
+        contentPane.add(btnReset);
 
-        // ======== PANEL CPU ========
+        // === TITRE PANEL CPU ===
+        JLabel title = new JLabel("Architecture interne du 6809");
+        title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(858, 10, 394, 25);
+        title.setForeground(new Color(128, 55, 95));
+        contentPane.add(title);
+
+        // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
-        cpuPanel.lblX.setBounds(70, 330, 95, 30);
-        cpuPanel.lblDP.setSize(95, 30);
-        cpuPanel.lblDP.setLocation(45, 260);
-        cpuPanel.lblB.setBounds(70, 200, 71, 30);
-        cpuPanel.lblA.setBounds(70, 150, 71, 30);
-        cpuPanel.lblU.setBounds(220, 90, 95, 30);
-        cpuPanel.lblS.setBounds(70, 90, 95, 30);
-        cpuPanel.lblPC.setBounds(100, 20, 163, 30);
-        cpuPanel.setForeground(new Color(255, 128, 192));
-        cpuPanel.setBackground(new Color(255, 132, 132));
-        cpuPanel.lblU.setForeground(new Color(128, 55, 95));
         cpuPanel.setBounds(858, 62, 394, 450);
         contentPane.add(cpuPanel);
 
-        // ======== TABLE ROM ========
-        scrollPane_1 = new JScrollPane();
-        scrollPane_1.setBounds(235, 28, 115, 174);
-        contentPane.add(scrollPane_1);
+        // === TABLE ROM ===
+        scrollPaneROM = new JScrollPane();
+        scrollPaneROM.setBounds(235, 28, 115, 174);
+        contentPane.add(scrollPaneROM);
 
-        table = new JTable();
-        scrollPane_1.setViewportView(table);
+        tableROM = new JTable();
+        scrollPaneROM.setViewportView(tableROM);
 
         DefaultTableModel modelROM = new DefaultTableModel();
         modelROM.addColumn("Adresse");
         modelROM.addColumn("Valeur");
-
         for (int i = 0xFC00; i <= 0xFFFF; i++)
             modelROM.addRow(new Object[]{String.format("%04X", i), "00"});
+        tableROM.setModel(modelROM);
+        scrollPaneROM.setVisible(false);
 
-        table.setModel(modelROM);
-        scrollPane_1.setVisible(false);
+        // === TABLE RAM ===
+        scrollPaneRAM = new JScrollPane();
+        scrollPaneRAM.setBounds(360, 30, 115, 172);
+        contentPane.add(scrollPaneRAM);
 
-        // ======== TABLE RAM ========
-        scrollPane_2 = new JScrollPane();
-        scrollPane_2.setBounds(360, 30, 115, 172);
-        contentPane.add(scrollPane_2);
-
-        table_2 = new JTable();
-        scrollPane_2.setViewportView(table_2);
+        tableRAM = new JTable();
+        scrollPaneRAM.setViewportView(tableRAM);
 
         DefaultTableModel modelRAM = new DefaultTableModel();
         modelRAM.addColumn("Adresse");
         modelRAM.addColumn("Valeur");
-
         for (int i = 0x0000; i <= 0x03FF; i++)
             modelRAM.addRow(new Object[]{String.format("%04X", i), "00"});
-
-        table_2.setModel(modelRAM);
-        
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(255, 132, 132));
-        panel.setForeground(new Color(0, 0, 0));
-        panel.setToolTipText("Architecture interne du 6809");
-        panel.setBounds(879, 10, 347, 25);
-        contentPane.add(panel);
-        scrollPane_2.setVisible(false);
+        tableRAM.setModel(modelRAM);
+        scrollPaneRAM.setVisible(false);
     }
 
-    // ==================================================================
-    // ========================= METHODES ===============================
-    // ==================================================================
-
+    // === MISE À JOUR MEMOIRE ===
     private void refreshRAM() {
-        DefaultTableModel model = (DefaultTableModel) table_2.getModel();
+        DefaultTableModel model = (DefaultTableModel) tableRAM.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
             int addr = Integer.parseInt(model.getValueAt(i, 0).toString(), 16);
             int value = memory.readByte(addr);
@@ -256,7 +225,7 @@ public class GUI extends JFrame {
     }
 
     private void refreshROM() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        DefaultTableModel model = (DefaultTableModel) tableROM.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
             int addr = Integer.parseInt(model.getValueAt(i, 0).toString(), 16);
             int value = memory.readByte(addr);
@@ -264,23 +233,134 @@ public class GUI extends JFrame {
         }
     }
 
-    private void loadTestProgram() {
+    private void assembleAndLoad(String src) {
 
-        int[] program = {
-            0x86, 0x05,      // LDA #$05
-            0xC6, 0x03,      // LDB #$03
-            0x8B, 0x02,      // ADDA #$02
-            0xD7, 0x0A,      // STB $000A
-            0x97, 0x0B,      // STA $000B
-            0x7E, 0xFC, 0x00 // JMP FC00
-        };
+        int addr = 0xFC00;       // Début ROM (comme ton CPU)
+        String[] lines = src.split("\n");
 
-        int addr = 0xFC00;
+        // Effacer la ROM avant de charger
+        for (int i = 0xFC00; i <= 0xFFFF; i++)
+            memory.writeByte(i, 0x00);
 
-        for (int op : program)
-            memory.writeByte(addr++, op);
+        for (String line : lines) {
 
+            line = line.trim();
+
+            // ignorer vide ou commentaires
+            if (line.isEmpty() || line.startsWith(";"))
+                continue;
+
+            // ---------------------------------------------
+            // LDA #$nn
+            // ---------------------------------------------
+            if (line.startsWith("LDA #$")) {
+                int val = Integer.parseInt(line.substring(6), 16);
+                memory.writeByte(addr++, 0x86);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // LDB #$nn
+            // ---------------------------------------------
+            if (line.startsWith("LDB #$")) {
+                int val = Integer.parseInt(line.substring(6), 16);
+                memory.writeByte(addr++, 0xC6);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // ADDA #$nn
+            // ---------------------------------------------
+            if (line.startsWith("ADDA #$")) {
+                int val = Integer.parseInt(line.substring(7), 16);
+                memory.writeByte(addr++, 0x8B);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // ADDB #$nn
+            // ---------------------------------------------
+            if (line.startsWith("ADDB #$")) {
+                int val = Integer.parseInt(line.substring(7), 16);
+                memory.writeByte(addr++, 0xCB);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // SUBA #$nn
+            // ---------------------------------------------
+            if (line.startsWith("SUBA #$")) {
+                int val = Integer.parseInt(line.substring(7), 16);
+                memory.writeByte(addr++, 0x80);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // SUBB #$nn
+            // ---------------------------------------------
+            if (line.startsWith("SUBB #$")) {
+                int val = Integer.parseInt(line.substring(7), 16);
+                memory.writeByte(addr++, 0xC0);
+                memory.writeByte(addr++, val);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // STA $nnnn
+            // ---------------------------------------------
+            if (line.startsWith("STA $")) {
+                int adr = Integer.parseInt(line.substring(5), 16);
+                memory.writeByte(addr++, 0xB7); // EXT mode
+                memory.writeByte(addr++, (adr >> 8) & 0xFF);
+                memory.writeByte(addr++, adr & 0xFF);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // STB $nnnn
+            // ---------------------------------------------
+            if (line.startsWith("STB $")) {
+                int adr = Integer.parseInt(line.substring(5), 16);
+                memory.writeByte(addr++, 0xF7); // EXT mode
+                memory.writeByte(addr++, (adr >> 8) & 0xFF);
+                memory.writeByte(addr++, adr & 0xFF);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // JMP $nnnn
+            // ---------------------------------------------
+            if (line.startsWith("JMP $")) {
+                int adr = Integer.parseInt(line.substring(5), 16);
+                memory.writeByte(addr++, 0x7E); // EXT mode
+                memory.writeByte(addr++, (adr >> 8) & 0xFF);
+                memory.writeByte(addr++, adr & 0xFF);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // NOP
+            // ---------------------------------------------
+            if (line.equals("NOP")) {
+                memory.writeByte(addr++, 0x12);
+                continue;
+            }
+
+            // ---------------------------------------------
+            // Instruction non-supportée
+            // ---------------------------------------------
+            throw new IllegalArgumentException("Instruction inconnue : " + line);
+        }
+
+        // === Vecteur RESET ===
         memory.writeByte(0xFFFE, 0xFC);
         memory.writeByte(0xFFFF, 0x00);
+
+        System.out.println("Programme assemblé et chargé !");
     }
 }
