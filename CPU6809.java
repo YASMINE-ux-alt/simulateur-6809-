@@ -1,4 +1,3 @@
-
 package cpu;
 
 import debugger.Debugger;
@@ -1135,7 +1134,7 @@ public class CPU6809 {
 
         // Breakpoint ?
         if (dbg != null && dbg.isBreakpoint(currentPC)) {
-            dbg.log(String.format("Arrêt sur breakpoint @ %04X", currentPC));
+            System.out.println(String.format("Arrêt sur breakpoint @ %04X", currentPC));
             dbg.dumpRegisters();
             return false; // STOP execution
         }
@@ -1150,52 +1149,17 @@ public class CPU6809 {
             );
         }
 
-        dbg.log(String.format("EXEC @ %04X : %s", currentPC, instr.getMnemonic()));
+        // Log simple vers la console
+        System.out.println(String.format("EXEC @ %04X : %s", 
+                 currentPC, instr.getMnemonic()));
 
+        // Exécuter l'instruction
         instr.execute(this);
         cycles += instr.getCycles();
 
-        dbg.dumpRegisters();
-
-        return true; // Continue execution
-    }
-
-    // Petit utilitaire pour debug
-    public String dumpRegisters() {
-        return String.format(
-                "A=%02X B=%02X D=%04X X=%04X Y=%04X S=%04X U=%04X PC=%04X DP=%02X CCR=%02X CYC=%d",
-                getA(), getB(), getD(), getX(), getY(), getS(), getU(), getPC(), getDP(), getCCR(), getCycles()
-        );
-    }
-    public boolean stepWithDebugger1(Debugger dbg) {
-
-        int currentPC = getPC();
-
-        // Breakpoint ?
-        if (dbg != null && dbg.isBreakpoint(currentPC)) {
-            dbg.log(String.format("Arrêt sur breakpoint @ %04X", currentPC));
-            dbg.dumpRegisters();
-            return false; // STOP execution
-        }
-
-        int opcode = fetch8();
-        Instruction instr = opcodes[opcode];
-
-        if (instr == null) {
-            throw new IllegalStateException(
-                String.format("Opcode %02X non implémenté @ PC=%04X",
-                        opcode, (currentPC & 0xFFFF))
-            );
-        }
-
-        dbg.log(String.format("EXEC @ %04X : %s", currentPC, instr.getMnemonic()));
-
-        instr.execute(this);
-        cycles += instr.getCycles();
-
-        dbg.dumpRegisters();
+        // Montrer les registres après exécution
+        if (dbg != null) dbg.dumpRegisters();
 
         return true; // continue execution
     }
-
 }
