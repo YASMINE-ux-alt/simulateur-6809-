@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import cpu.CPU6809;
 import debugger.Debugger;
 import memory.Memory;
+import assembler.Assembler;
 
 public class GUI extends JFrame {
 
@@ -18,7 +19,11 @@ public class GUI extends JFrame {
     private Memory memory;
     private CPU6809 cpu;
     private Debugger debugger;
+    private Assembler assembler;
 
+  
+
+  
     // ===== CONTROLE EXECUTION =====
     private boolean running = false;
     private SwingWorker<Void, Void> worker;
@@ -52,6 +57,8 @@ public class GUI extends JFrame {
         memory = new Memory();
         cpu = new CPU6809(memory);
         debugger = new Debugger(cpu, memory);
+        assembler = new Assembler();
+
 
         cpu.reset();
 
@@ -100,11 +107,12 @@ public class GUI extends JFrame {
         JButton btnAssemble = new JButton("Assemble");
         btnAssemble.setBounds(190, 0, 80, 20);
         btnAssemble.addActionListener(e -> {
-            assembleAndLoad(textArea.getText());
-            cpu.reset();           
+            assembler.assembleAndLoad(textArea.getText(), memory);
+            cpu.reset();
             cpuPanel.refresh();
             refreshROM();
         });
+
 
         contentPane.add(btnAssemble);
 
@@ -233,134 +241,5 @@ public class GUI extends JFrame {
         }
     }
 
-    private void assembleAndLoad(String src) {
-
-        int addr = 0xFC00;       // Début ROM (comme ton CPU)
-        String[] lines = src.split("\n");
-
-        // Effacer la ROM avant de charger
-        for (int i = 0xFC00; i <= 0xFFFF; i++)
-            memory.writeByte(i, 0x00);
-
-        for (String line : lines) {
-
-            line = line.trim();
-
-            // ignorer vide ou commentaires
-            if (line.isEmpty() || line.startsWith(";"))
-                continue;
-
-            // ---------------------------------------------
-            // LDA #$nn
-            // ---------------------------------------------
-            if (line.startsWith("LDA #$")) {
-                int val = Integer.parseInt(line.substring(6), 16);
-                memory.writeByte(addr++, 0x86);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // LDB #$nn
-            // ---------------------------------------------
-            if (line.startsWith("LDB #$")) {
-                int val = Integer.parseInt(line.substring(6), 16);
-                memory.writeByte(addr++, 0xC6);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // ADDA #$nn
-            // ---------------------------------------------
-            if (line.startsWith("ADDA #$")) {
-                int val = Integer.parseInt(line.substring(7), 16);
-                memory.writeByte(addr++, 0x8B);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // ADDB #$nn
-            // ---------------------------------------------
-            if (line.startsWith("ADDB #$")) {
-                int val = Integer.parseInt(line.substring(7), 16);
-                memory.writeByte(addr++, 0xCB);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // SUBA #$nn
-            // ---------------------------------------------
-            if (line.startsWith("SUBA #$")) {
-                int val = Integer.parseInt(line.substring(7), 16);
-                memory.writeByte(addr++, 0x80);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // SUBB #$nn
-            // ---------------------------------------------
-            if (line.startsWith("SUBB #$")) {
-                int val = Integer.parseInt(line.substring(7), 16);
-                memory.writeByte(addr++, 0xC0);
-                memory.writeByte(addr++, val);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // STA $nnnn
-            // ---------------------------------------------
-            if (line.startsWith("STA $")) {
-                int adr = Integer.parseInt(line.substring(5), 16);
-                memory.writeByte(addr++, 0xB7); // EXT mode
-                memory.writeByte(addr++, (adr >> 8) & 0xFF);
-                memory.writeByte(addr++, adr & 0xFF);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // STB $nnnn
-            // ---------------------------------------------
-            if (line.startsWith("STB $")) {
-                int adr = Integer.parseInt(line.substring(5), 16);
-                memory.writeByte(addr++, 0xF7); // EXT mode
-                memory.writeByte(addr++, (adr >> 8) & 0xFF);
-                memory.writeByte(addr++, adr & 0xFF);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // JMP $nnnn
-            // ---------------------------------------------
-            if (line.startsWith("JMP $")) {
-                int adr = Integer.parseInt(line.substring(5), 16);
-                memory.writeByte(addr++, 0x7E); // EXT mode
-                memory.writeByte(addr++, (adr >> 8) & 0xFF);
-                memory.writeByte(addr++, adr & 0xFF);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // NOP
-            // ---------------------------------------------
-            if (line.equals("NOP")) {
-                memory.writeByte(addr++, 0x12);
-                continue;
-            }
-
-            // ---------------------------------------------
-            // Instruction non-supportée
-            // ---------------------------------------------
-            throw new IllegalArgumentException("Instruction inconnue : " + line);
-        }
-
-        // === Vecteur RESET ===
-        memory.writeByte(0xFFFE, 0xFC);
-        memory.writeByte(0xFFFF, 0x00);
-
-        System.out.println("Programme assemblé et chargé !");
-    }
+    
 }
