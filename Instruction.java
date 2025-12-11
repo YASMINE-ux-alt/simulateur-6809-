@@ -8,24 +8,23 @@ public class Instruction {
     // Modes d’adressage supportés
     // -------------------------------
     public enum AddressingMode {
-        IMMEDIATE8,     // #$xx
-        IMMEDIATE16,    // #$xxxx
-        DIRECT,         // <addr> = DP:offset
-        INDEXED,        // ,X / offset,X / ,Y / offset,Y
-        EXTENDED,       // $xxxx
-        RELATIVE,       // branchement relatif
-        INHERENT        // pas d’opérande
+        IMMEDIATE8,
+        IMMEDIATE16,
+        DIRECT,
+        INDEXED,
+        EXTENDED,
+        INHERENT
     }
 
     // -------------------------------
     // Données de l’instruction
     // -------------------------------
-    private final String mnemonic;                   // "LDA", "ADDA", etc.
-    private final int opcode;                        // code machine 0x86, 0x8B...
-    private final int size;                          // nombre d’octets (1 à 3)
-    private final int cycles;                        // cycles CPU
+    private final String mnemonic;
+    private final int opcode;     //
+    private final int size;
+    private final int cycles;
     private final AddressingMode mode;
-    private final Consumer<CPU6809> executor;        // code à exécuter
+    private final Consumer<CPU6809> executor;
 
     // -------------------------------
     // Constructeur
