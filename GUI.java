@@ -105,6 +105,7 @@ public class GUI extends JFrame {
         });
         contentPane.add(btnRam);
         JButton btnAssemble = new JButton("Assemble");
+        btnAssemble.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnAssemble.setBounds(190, 0, 80, 20);
         btnAssemble.addActionListener(e -> {
             assembler.assembleAndLoad(textArea.getText(), memory);
@@ -186,7 +187,8 @@ public class GUI extends JFrame {
 
         // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
-        cpuPanel.setBounds(858, 62, 394, 450);
+        cpuPanel.lblDP.setBounds(70, 260, 106, 30);
+        cpuPanel.setBounds(858, 64, 394, 450);
         contentPane.add(cpuPanel);
 
         // === TABLE ROM ===
