@@ -193,9 +193,9 @@ public class GUI extends JFrame {
         cpuPanel.lblS.setBounds(70, 90, 95, 30);
         cpuPanel.lblPC.setBounds(100, 20, 163, 30);
         cpuPanel.setForeground(new Color(255, 128, 192));
-        cpuPanel.setBackground(new Color(200, 200, 200));
+        cpuPanel.setBackground(new Color(255, 132, 132));
         cpuPanel.lblU.setForeground(new Color(128, 55, 95));
-        cpuPanel.setBounds(879, 11, 394, 450);
+        cpuPanel.setBounds(858, 62, 394, 450);
         contentPane.add(cpuPanel);
 
         // ======== TABLE ROM ========
@@ -232,6 +232,13 @@ public class GUI extends JFrame {
             modelRAM.addRow(new Object[]{String.format("%04X", i), "00"});
 
         table_2.setModel(modelRAM);
+        
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(255, 132, 132));
+        panel.setForeground(new Color(0, 0, 0));
+        panel.setToolTipText("Architecture interne du 6809");
+        panel.setBounds(879, 10, 347, 25);
+        contentPane.add(panel);
         scrollPane_2.setVisible(false);
     }
 
