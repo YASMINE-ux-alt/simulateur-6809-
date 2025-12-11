@@ -14,114 +14,144 @@ public class Debugger {
     // Liste des breakpoints
     private final Set<Integer> breakpoints = new HashSet<>();
 
-    // Log interne
-    private final StringBuilder logBuffer = new StringBuilder();
+    // État d’exécution
+    private boolean running = false;
 
     public Debugger(CPU6809 cpu, Memory mem) {
         this.cpu = cpu;
         this.mem = mem;
     }
 
-    // =====================================================
-    //  BREAKPOINTS
-    // =====================================================
+    // ============================================
+    // BREAKPOINTS
+    // ============================================
 
- 
-	public void addBreakpoint(int addr) {
+    public void addBreakpoint(int addr) {
         addr &= 0xFFFF;
         breakpoints.add(addr);
-        log(String.format("Breakpoint ajouté @ %04X", addr));
+        System.out.println("Breakpoint ajouté @ " + hex(addr));
     }
 
     public void removeBreakpoint(int addr) {
         addr &= 0xFFFF;
         breakpoints.remove(addr);
-        log(String.format("Breakpoint supprimé @ %04X", addr));
-    }
-
-    public void clearBreakpoints() {
-        breakpoints.clear();
-        log("Tous les breakpoints ont été supprimés.");
+        System.out.println("Breakpoint supprimé @ " + hex(addr));
     }
 
     public boolean isBreakpoint(int addr) {
         return breakpoints.contains(addr & 0xFFFF);
     }
 
-    public Set<Integer> getBreakpoints() {
-        return new HashSet<>(breakpoints);
-    }
+    // ============================================
+    // EXÉCUTION
+    // ============================================
 
-    // =====================================================
-    //  LOGGING
-    // =====================================================
-
-    public void log(String msg) {
-        logBuffer.append(msg).append("\n");
-        System.out.println(msg);
-    }
-
-    public String getLog() {
-        return logBuffer.toString();
-    }
-
-    public void clearLog() {
-        logBuffer.setLength(0);
-    }
-
-    // =====================================================
-    //  EXECUTION
-    // =====================================================
-
-    /**
-     * Exécute une seule instruction.
-     */
+    // Exécute une seule instruction (pas à pas)
     public void step() {
-        cpu.stepWithDebugger(this);
+        int pc = cpu.getPC();
+        if (isBreakpoint(pc)) {
+            System.out.println("⚠ Breakpoint atteint @ " + hex(pc));
+            dumpRegisters();
+            return;
+        }
+
+        cpu.step();
+        dumpRegisters();
     }
 
-    /**
-     * Exécute jusqu'à un breakpoint ou fin du programme.
-     */
+    // Exécution continue jusqu'à un breakpoint
     public void run() {
-        log("=== Exécution démarrée ===");
+        running = true;
+        System.out.println("▶ Exécution démarrée");
 
-        while (true) {
-            boolean cont = cpu.stepWithDebugger(this);
-            if (!cont) {
-                log("=== Exécution stoppée ===");
+        while (running) {
+
+            int pc = cpu.getPC();
+            if (isBreakpoint(pc)) {
+                System.out.println("⛔ Breakpoint atteint @ " + hex(pc));
+                dumpRegisters();
+                running = false;
                 break;
             }
+
+            cpu.step();
         }
+
+        System.out.println("■ Exécution stoppée");
     }
 
-    // =====================================================
-    //  OUTILS DEBUG
-    // =====================================================
+    // Arrête l’exécution
+    public void stop() {
+        running = false;
+        System.out.println("■ Stop demandé");
+    }
+
+    // ============================================
+    // INSPECTION
+    // ============================================
 
     public void dumpRegisters() {
-        log("--- Registres ---");
-        log(cpu.dumpRegisters());
+        System.out.println("-----------------------------");
+        System.out.println(" PC=" + hex(cpu.getPC()));
+        System.out.println(" A =" + hex8(cpu.getA()));
+        System.out.println(" B =" + hex8(cpu.getB()));
+        System.out.println(" D =" + hex(cpu.getD()));
+        System.out.println(" X =" + hex(cpu.getX()));
+        System.out.println(" Y =" + hex(cpu.getY()));
+        System.out.println(" S =" + hex(cpu.getS()));
+        System.out.println(" U =" + hex(cpu.getU()));
+        System.out.println(" DP=" + hex8(cpu.getDP()));
+        System.out.println(" CCR=" + hex8(cpu.getCCR()));
+        System.out.println("-----------------------------");
     }
 
-    public void dumpMemory(int start, int end) {
-        log("--- Dump mémoire ---");
+    // Dump mémoire RAM en HEX (
+    public void dumpRAM(int start, int length) {
+        start &= 0xFFFF;
+        System.out.println("=== RAM Dump ===");
 
-        for (int addr = start & 0xFFFF; addr <= (end & 0xFFFF); addr++) {
-            int val = mem.readByte(addr);
-            log(String.format("%04X : %02X", addr, val));
+        for (int i = 0; i < length; i += 16) {
+            int addr = (start + i) & 0xFFFF;
+
+            StringBuilder line = new StringBuilder();
+            line.append(hex(addr)).append(": ");
+
+            for (int j = 0; j < 16 && (i + j) < length; j++) {
+                int value = mem.readByte((addr + j) & 0xFFFF);
+                line.append(hex8(value)).append(" ");
+            }
+
+            System.out.println(line);
+        }
+    }public void dumpROM(int start, int length) {
+        start &= 0xFFFF;
+        System.out.println("=== ROM Dump ===");
+
+        for (int i = 0; i < length; i += 16) {
+            int addr = (start + i) & 0xFFFF;
+
+            StringBuilder line = new StringBuilder();
+            line.append(hex(addr)).append(": ");
+
+            for (int j = 0; j < 16 && (i + j) < length; j++) {
+                int value = mem.readByte((addr + j) & 0xFFFF);
+                line.append(hex8(value)).append(" ");
+            }
+
+            System.out.println(line);
         }
     }
 
-    public void dumpMemoryBlock(int addr, int size) {
-        dumpMemory(addr, addr + size - 1);
-    }
-    public int readMemory(int addr) {
-        return mem.readByte(addr & 0xFFFF);
-    }
-    public void writeMemory(int addr, int value) {
-        mem.writeByte(addr & 0xFFFF, value & 0xFF);
-        log(String.format("Mémoire modifiée @ %04X = %02X", addr, value));
+
+    // ============================================
+    // FORMATAGE
+    // ============================================
+
+    private String hex(int v) {
+        return String.format("%04X", v & 0xFFFF);
     }
 
+    private String hex8(int v) {
+        return String.format("%02X", v & 0xFF);
+    }
 }
