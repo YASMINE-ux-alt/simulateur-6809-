@@ -89,7 +89,7 @@ public class GUI extends JFrame {
         contentPane.add(BtnNew);
 
         JButton btnRom = new JButton("ROM");
-        btnRom.setBounds(260, 0, 64, 20);
+        btnRom.setBounds(65, 0, 64, 20);
         btnRom.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRom.addActionListener(e -> {
             scrollPaneROM.setVisible(true);
@@ -98,7 +98,7 @@ public class GUI extends JFrame {
         contentPane.add(btnRom);
 
         JButton btnRam = new JButton("RAM");
-        btnRam.setBounds(376, 0, 64, 20);
+        btnRam.setBounds(128, 0, 64, 20);
         btnRam.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRam.addActionListener(e -> {
             scrollPaneRAM.setVisible(true);
@@ -106,7 +106,7 @@ public class GUI extends JFrame {
         });
         contentPane.add(btnRam);
         JButton btnAssemble = new JButton("Assemble");
-        btnAssemble.setBounds(450, 0, 80, 20);
+        btnAssemble.setBounds(190, 0, 93, 20);
         btnAssemble.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnAssemble.addActionListener(e -> {
             assembler.assembleAndLoad(textArea.getText(), memory);
@@ -119,7 +119,7 @@ public class GUI extends JFrame {
         contentPane.add(btnAssemble);
 
         JButton btnRun = new JButton("Run");
-        btnRun.setBounds(519, 0, 64, 20);
+        btnRun.setBounds(280, 0, 64, 20);
         btnRun.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         contentPane.add(btnRun);
 
@@ -145,7 +145,7 @@ public class GUI extends JFrame {
         });
 
         JButton btnStop = new JButton("Stop");
-        btnStop.setBounds(579, 0, 64, 20);
+        btnStop.setBounds(346, 0, 64, 20);
         btnStop.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnStop.addActionListener(e -> {
             running = false;
@@ -154,7 +154,7 @@ public class GUI extends JFrame {
         contentPane.add(btnStop);
 
         JButton btnPasPas = new JButton("Pas à pas");
-        btnPasPas.setBounds(643, 0, 93, 20);
+        btnPasPas.setBounds(409, 0, 93, 20);
         btnPasPas.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnPasPas.addActionListener(e -> {
             try {
@@ -169,7 +169,7 @@ public class GUI extends JFrame {
         contentPane.add(btnPasPas);
 
         JButton btnReset = new JButton("Reset");
-        btnReset.setBounds(734, 0, 80, 20);
+        btnReset.setBounds(501, 0, 80, 20);
         btnReset.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnReset.addActionListener(e -> {
             cpu.reset();
