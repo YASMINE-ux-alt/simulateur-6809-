@@ -67,10 +67,10 @@ public class GUI extends JFrame {
         setBounds(100, 100, 1308, 882);
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(255, 210, 210));
+        contentPane.setBackground(new Color(173, 209, 245));
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(null);
         setContentPane(contentPane);
+        contentPane.setLayout(null);
 
         // === ZONE CODE ===
         JScrollPane scrollPane = new JScrollPane();
@@ -78,18 +78,19 @@ public class GUI extends JFrame {
         contentPane.add(scrollPane);
 
         JTextArea textArea = new JTextArea();
+        textArea.setFont(new Font("Arial Black", Font.BOLD, 13));
         scrollPane.setViewportView(textArea);
 
         // === BOUTONS ===
         JButton BtnNew = new JButton("New");
-        BtnNew.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         BtnNew.setBounds(0, 0, 64, 20);
+        BtnNew.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         BtnNew.addActionListener(e -> textArea.setText(""));
         contentPane.add(BtnNew);
 
         JButton btnRom = new JButton("ROM");
-        btnRom.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRom.setBounds(260, 0, 64, 20);
+        btnRom.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRom.addActionListener(e -> {
             scrollPaneROM.setVisible(true);
             refreshROM();
@@ -97,16 +98,16 @@ public class GUI extends JFrame {
         contentPane.add(btnRom);
 
         JButton btnRam = new JButton("RAM");
+        btnRam.setBounds(376, 0, 64, 20);
         btnRam.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnRam.setBounds(330, 0, 64, 20);
         btnRam.addActionListener(e -> {
             scrollPaneRAM.setVisible(true);
             refreshRAM();
         });
         contentPane.add(btnRam);
         JButton btnAssemble = new JButton("Assemble");
+        btnAssemble.setBounds(450, 0, 80, 20);
         btnAssemble.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnAssemble.setBounds(190, 0, 80, 20);
         btnAssemble.addActionListener(e -> {
             assembler.assembleAndLoad(textArea.getText(), memory);
             cpu.reset();
@@ -118,10 +119,11 @@ public class GUI extends JFrame {
         contentPane.add(btnAssemble);
 
         JButton btnRun = new JButton("Run");
+        btnRun.setBounds(519, 0, 64, 20);
         btnRun.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnRun.setBounds(505, 0, 64, 20);
         contentPane.add(btnRun);
 
+        
         btnRun.addActionListener(e -> {
             if (running) return;
             running = true;
@@ -143,8 +145,8 @@ public class GUI extends JFrame {
         });
 
         JButton btnStop = new JButton("Stop");
+        btnStop.setBounds(579, 0, 64, 20);
         btnStop.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnStop.setBounds(569, 0, 64, 20);
         btnStop.addActionListener(e -> {
             running = false;
             if (worker != null) worker.cancel(true);
@@ -152,8 +154,8 @@ public class GUI extends JFrame {
         contentPane.add(btnStop);
 
         JButton btnPasPas = new JButton("Pas à pas");
+        btnPasPas.setBounds(643, 0, 93, 20);
         btnPasPas.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnPasPas.setBounds(631, 0, 93, 20);
         btnPasPas.addActionListener(e -> {
             try {
                 cpu.step();
@@ -167,8 +169,8 @@ public class GUI extends JFrame {
         contentPane.add(btnPasPas);
 
         JButton btnReset = new JButton("Reset");
+        btnReset.setBounds(734, 0, 80, 20);
         btnReset.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnReset.setBounds(722, 0, 80, 20);
         btnReset.addActionListener(e -> {
             cpu.reset();
             cpuPanel.refresh();
@@ -179,16 +181,24 @@ public class GUI extends JFrame {
 
         // === TITRE PANEL CPU ===
         JLabel title = new JLabel("Architecture interne du 6809");
+        title.setBounds(829, -3, 394, 25);
         title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBounds(858, 10, 394, 25);
-        title.setForeground(new Color(128, 55, 95));
+        title.setForeground(new Color(0, 0, 160));
         contentPane.add(title);
 
         // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
+        cpuPanel.setForeground(new Color(224, 222, 224));
+        cpuPanel.setBackground(new Color(224, 222, 224));
+        cpuPanel.setBounds(839, 37, 394, 390);
+        cpuPanel.lblY.setBounds(220, 330, 106, 30);
+        cpuPanel.lblU.setBounds(220, 90, 97, 30);
+        cpuPanel.lblS.setBounds(70, 90, 106, 30);
+        cpuPanel.lblA.setBounds(70, 150, 69, 30);
+        cpuPanel.lblB.setBounds(70, 200, 69, 30);
+        cpuPanel.lblX.setBounds(70, 330, 106, 30);
         cpuPanel.lblDP.setBounds(70, 260, 106, 30);
-        cpuPanel.setBounds(858, 64, 394, 450);
         contentPane.add(cpuPanel);
 
         // === TABLE ROM ===
