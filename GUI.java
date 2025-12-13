@@ -39,6 +39,8 @@ public class GUI extends JFrame {
 
     // ===== PANEL CPU =====
     private CPUPanel6809 cpuPanel;
+    //=======LABEL CONSOLE=======
+    private JLabel coNsole;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -181,7 +183,7 @@ public class GUI extends JFrame {
 
         // === TITRE PANEL CPU ===
         JLabel title = new JLabel("Architecture interne du 6809");
-        title.setBounds(829, -3, 394, 25);
+        title.setBounds(827, 2, 394, 25);
         title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(new Color(0, 0, 160));
@@ -231,7 +233,40 @@ public class GUI extends JFrame {
         for (int i = 0x0000; i <= 0x03FF; i++)
             modelRAM.addRow(new Object[]{String.format("%04X", i), "00"});
         tableRAM.setModel(modelRAM);
-        scrollPaneRAM.setVisible(false);
+        
+        JLabel lblConsole = new JLabel("CONSOLE");
+        lblConsole.setHorizontalAlignment(SwingConstants.CENTER);
+        lblConsole.setForeground(new Color(0, 0, 160));
+        lblConsole.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
+        lblConsole.setBounds(65, 468, 394, 25);
+        contentPane.add(lblConsole);
+        
+        JTextArea consoleArea = new JTextArea();
+        consoleArea.setBounds(0, 493, 539, 119);
+        contentPane.add(consoleArea);
+        consoleArea.setEditable(false);
+        
+        JButton btnProgramme = new JButton("console");
+        btnProgramme.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
+        btnProgramme.setBounds(580, 0, 80, 20);
+        btnProgramme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String codeSource = textArea.getText();
+                consoleArea.setText("--- Début de l'exécution ---\n");
+                consoleArea.append(codeSource);
+                consoleArea.append("\n--- Fin de l'exécution ---\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            }
+        });
+        contentPane.add(btnProgramme);
+        
+        
+        
+       
+        
+        
+        
     }
 
     // === MISE À JOUR MEMOIRE ===
@@ -252,6 +287,4 @@ public class GUI extends JFrame {
             model.setValueAt(String.format("%02X", value), i, 1);
         }
     }
-
-    
 }
