@@ -233,6 +233,7 @@ public class GUI extends JFrame {
         for (int i = 0x0000; i <= 0x03FF; i++)
             modelRAM.addRow(new Object[]{String.format("%04X", i), "00"});
         tableRAM.setModel(modelRAM);
+        scrollPaneRAM.setVisible(false);
         
         JLabel lblConsole = new JLabel("CONSOLE");
         lblConsole.setHorizontalAlignment(SwingConstants.CENTER);
@@ -240,6 +241,7 @@ public class GUI extends JFrame {
         lblConsole.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
         lblConsole.setBounds(65, 468, 394, 25);
         contentPane.add(lblConsole);
+        
         
         JTextArea consoleArea = new JTextArea();
         consoleArea.setBounds(0, 493, 539, 119);
