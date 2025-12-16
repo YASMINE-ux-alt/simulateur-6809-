@@ -10,6 +10,7 @@ import cpu.CPU6809;
 import debugger.Debugger;
 import memory.Memory;
 import assembler.Assembler;
+import assembler.Disassembler6809;
 
 public class GUI extends JFrame {
 
@@ -21,7 +22,8 @@ public class GUI extends JFrame {
     private Debugger debugger;
     private Assembler assembler;
 
-  
+    private Disassembler6809 disassembler;
+
 
   
     // ===== CONTROLE EXECUTION =====
@@ -191,9 +193,11 @@ public class GUI extends JFrame {
 
         // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
+        cpuPanel.lblCycles.setSize(40, 30);
+        cpuPanel.lblCycles.setLocation(120, 380);
         cpuPanel.setForeground(new Color(224, 222, 224));
         cpuPanel.setBackground(new Color(224, 222, 224));
-        cpuPanel.setBounds(839, 37, 394, 390);
+        cpuPanel.setBounds(839, 37, 394, 444);
         cpuPanel.lblY.setBounds(220, 330, 106, 30);
         cpuPanel.lblU.setBounds(220, 90, 97, 30);
         cpuPanel.lblS.setBounds(70, 90, 106, 30);
@@ -257,7 +261,6 @@ public class GUI extends JFrame {
                 String codeSource = textArea.getText();
                 consoleArea.setText("--- Début de l'exécution ---\n");
                 consoleArea.append(codeSource);
-                consoleArea.append("\n--- Fin de l'exécution ---\n");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
             }
         });
@@ -270,6 +273,10 @@ public class GUI extends JFrame {
         
         
     }
+    
+  
+
+
 
     // === MISE À JOUR MEMOIRE ===
     private void refreshRAM() {
