@@ -23,7 +23,7 @@ public class GUI extends JFrame {
     private Assembler assembler;
 
     private Disassembler6809 disassembler;
-
+    private JTextArea consoleArea;
 
   
     // ===== CONTROLE EXECUTION =====
@@ -42,18 +42,7 @@ public class GUI extends JFrame {
     // ===== PANEL CPU =====
     private CPUPanel6809 cpuPanel;
     //=======LABEL CONSOLE=======
-    private JLabel coNsole;
 
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                GUI frame = new GUI();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     public GUI() {
 
@@ -63,6 +52,7 @@ public class GUI extends JFrame {
         debugger = new Debugger(cpu, memory);
         assembler = new Assembler();
 
+        disassembler = new Disassembler6809(cpu, memory);
 
         cpu.reset();
 
@@ -75,6 +65,15 @@ public class GUI extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
+     // === CONSOLE DÉSASSEMBLEUR ===
+        JScrollPane scrollConsole = new JScrollPane();
+        scrollConsole.setBounds(0, 470, 350, 350);
+        contentPane.add(scrollConsole);
+
+        consoleArea = new JTextArea();
+        consoleArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+        consoleArea.setEditable(false);
+        scrollConsole.setViewportView(consoleArea);
 
         // === ZONE CODE ===
         JScrollPane scrollPane = new JScrollPane();
@@ -117,7 +116,11 @@ public class GUI extends JFrame {
             cpu.reset();
             cpuPanel.refresh();
             refreshROM();
-        });
+            consoleArea.setText(
+            	    disassembler.disassemble(0xFC00, 20)
+            		);
+        } );
+       
 
 
         contentPane.add(btnAssemble);
@@ -137,14 +140,26 @@ public class GUI extends JFrame {
                 protected Void doInBackground() throws Exception {
                     while (running) {
                         cpu.step();
-                        cpuPanel.refresh();
-                        refreshRAM();
-                        refreshROM();
+
+                        // 👇 TOUT CE QUI TOUCHE À SWING ICI
+                        SwingUtilities.invokeLater(() -> {
+                            cpuPanel.refresh();
+                            refreshRAM();
+                            refreshROM();
+
+                            // 👇 ICI EXACTEMENT
+                            consoleArea.setText(
+                                disassembler.disassemble(cpu.getPC(), 10)
+                            );
+                        });
+
                         Thread.sleep(20);
                     }
                     return null;
                 }
             };
+
+
             worker.execute();
         });
 
@@ -166,6 +181,10 @@ public class GUI extends JFrame {
                 cpuPanel.refresh();
                 refreshRAM();
                 refreshROM();
+                consoleArea.setText(
+                	    disassembler.disassemble(cpu.getPC(), 10)
+                	);
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Erreur CPU : " + ex.getMessage());
             }
@@ -193,11 +212,9 @@ public class GUI extends JFrame {
 
         // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
-        cpuPanel.lblCycles.setSize(40, 30);
-        cpuPanel.lblCycles.setLocation(120, 380);
         cpuPanel.setForeground(new Color(224, 222, 224));
         cpuPanel.setBackground(new Color(224, 222, 224));
-        cpuPanel.setBounds(839, 37, 394, 444);
+        cpuPanel.setBounds(839, 37, 394, 430);
         cpuPanel.lblY.setBounds(220, 330, 106, 30);
         cpuPanel.lblU.setBounds(220, 90, 97, 30);
         cpuPanel.lblS.setBounds(70, 90, 106, 30);
@@ -238,33 +255,8 @@ public class GUI extends JFrame {
             modelRAM.addRow(new Object[]{String.format("%04X", i), "00"});
         tableRAM.setModel(modelRAM);
         scrollPaneRAM.setVisible(false);
+       
         
-        JLabel lblConsole = new JLabel("CONSOLE");
-        lblConsole.setHorizontalAlignment(SwingConstants.CENTER);
-        lblConsole.setForeground(new Color(0, 0, 160));
-        lblConsole.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
-        lblConsole.setBounds(65, 468, 394, 25);
-        contentPane.add(lblConsole);
-        
-        
-        JTextArea consoleArea = new JTextArea();
-        consoleArea.setBounds(0, 493, 539, 119);
-        contentPane.add(consoleArea);
-        consoleArea.setEditable(false);
-        
-        JButton btnProgramme = new JButton("console");
-        btnProgramme.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
-        btnProgramme.setBounds(580, 0, 80, 20);
-        btnProgramme.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String codeSource = textArea.getText();
-                consoleArea.setText("--- Début de l'exécution ---\n");
-                consoleArea.append(codeSource);
-                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-            }
-        });
-        contentPane.add(btnProgramme);
         
         
         
@@ -273,10 +265,6 @@ public class GUI extends JFrame {
         
         
     }
-    
-  
-
-
 
     // === MISE À JOUR MEMOIRE ===
     private void refreshRAM() {
@@ -297,3 +285,4 @@ public class GUI extends JFrame {
         }
     }
 }
+
