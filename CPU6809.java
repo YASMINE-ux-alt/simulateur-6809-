@@ -82,6 +82,11 @@ public class CPU6809 {
 
     public long getCycles() { return cycles; }
 
+    public Instruction getInstruction(int opcode) {
+        return opcodes[opcode & 0xFF];
+    }
+
+    
     // ====== Gestion des flags ======
     private void setFlag(int flag, boolean value) {
         if (value) {
