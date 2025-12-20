@@ -102,7 +102,7 @@ public class GUI extends JFrame {
         BtnNew.addActionListener(e -> textArea.setText(""));
         
         JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Editeur du programme", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Editeur ", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
         scrollPane.setColumnHeaderView(panel);
         panel.setLayout(new CardLayout(0, 0));
         contentPane.add(BtnNew);
