@@ -11,6 +11,10 @@ import debugger.Debugger;
 import memory.Memory;
 import assembler.Assembler;
 import assembler.Disassembler6809;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.GroupLayout.Alignment;
 
 public class GUI extends JFrame {
 
@@ -61,19 +65,25 @@ public class GUI extends JFrame {
         setBounds(100, 100, 1308, 882);
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(173, 209, 245));
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setBackground(new Color(156, 185, 216));
+        contentPane.setBorder(new TitledBorder(null, "Editeur du programme", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         setContentPane(contentPane);
         contentPane.setLayout(null);
      // === CONSOLE DÉSASSEMBLEUR ===
         JScrollPane scrollConsole = new JScrollPane();
-        scrollConsole.setBounds(0, 470, 350, 350);
+        scrollConsole.setBounds(0, 494, 350, 182);
         contentPane.add(scrollConsole);
-
-        consoleArea = new JTextArea();
-        consoleArea.setFont(new Font("Consolas", Font.PLAIN, 13));
-        consoleArea.setEditable(false);
-        scrollConsole.setViewportView(consoleArea);
+        
+                consoleArea = new JTextArea();
+                scrollConsole.setViewportView(consoleArea);
+                consoleArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+                consoleArea.setEditable(false);
+                consoleArea.setText(
+                	    disassembler.disassemble(0xFC00, 20)
+                		);
+                consoleArea.setText(
+                	    disassembler.disassemble(cpu.getPC(), 10)
+                	);
 
         // === ZONE CODE ===
         JScrollPane scrollPane = new JScrollPane();
@@ -85,13 +95,20 @@ public class GUI extends JFrame {
         scrollPane.setViewportView(textArea);
 
         // === BOUTONS ===
-        JButton BtnNew = new JButton("New");
+        JButton BtnNew = new JButton("Nouveau");
+        BtnNew.setToolTipText("un nouveau programme");
         BtnNew.setBounds(0, 0, 64, 20);
         BtnNew.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         BtnNew.addActionListener(e -> textArea.setText(""));
+        
+        JPanel panel = new JPanel();
+        panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Editeur du programme", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        scrollPane.setColumnHeaderView(panel);
+        panel.setLayout(new CardLayout(0, 0));
         contentPane.add(BtnNew);
 
         JButton btnRom = new JButton("ROM");
+        btnRom.setToolTipText("Afficher la mémoire ROM");
         btnRom.setBounds(65, 0, 64, 20);
         btnRom.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRom.addActionListener(e -> {
@@ -101,6 +118,7 @@ public class GUI extends JFrame {
         contentPane.add(btnRom);
 
         JButton btnRam = new JButton("RAM");
+        btnRam.setToolTipText("Afficher la mémoire RAM");
         btnRam.setBounds(128, 0, 64, 20);
         btnRam.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnRam.addActionListener(e -> {
@@ -108,7 +126,7 @@ public class GUI extends JFrame {
             refreshRAM();
         });
         contentPane.add(btnRam);
-        JButton btnAssemble = new JButton("Assemble");
+        JButton btnAssemble = new JButton("Assembler");
         btnAssemble.setBounds(190, 0, 93, 20);
         btnAssemble.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnAssemble.addActionListener(e -> {
@@ -116,17 +134,15 @@ public class GUI extends JFrame {
             cpu.reset();
             cpuPanel.refresh();
             refreshROM();
-            consoleArea.setText(
-            	    disassembler.disassemble(0xFC00, 20)
-            		);
         } );
        
 
 
         contentPane.add(btnAssemble);
 
-        JButton btnRun = new JButton("Run");
-        btnRun.setBounds(280, 0, 64, 20);
+        JButton btnRun = new JButton("Exécuter");
+        btnRun.setToolTipText("Exécuter le programme");
+        btnRun.setBounds(282, 0, 79, 20);
         btnRun.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         contentPane.add(btnRun);
 
@@ -163,8 +179,9 @@ public class GUI extends JFrame {
             worker.execute();
         });
 
-        JButton btnStop = new JButton("Stop");
-        btnStop.setBounds(346, 0, 64, 20);
+        JButton btnStop = new JButton("Arrêter");
+        btnStop.setToolTipText("Arrêter l'exécution");
+        btnStop.setBounds(356, 0, 98, 20);
         btnStop.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnStop.addActionListener(e -> {
             running = false;
@@ -173,7 +190,8 @@ public class GUI extends JFrame {
         contentPane.add(btnStop);
 
         JButton btnPasPas = new JButton("Pas à pas");
-        btnPasPas.setBounds(409, 0, 93, 20);
+        btnPasPas.setToolTipText("Exécution pas à pas");
+        btnPasPas.setBounds(454, 0, 93, 20);
         btnPasPas.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnPasPas.addActionListener(e -> {
             try {
@@ -181,9 +199,6 @@ public class GUI extends JFrame {
                 cpuPanel.refresh();
                 refreshRAM();
                 refreshROM();
-                consoleArea.setText(
-                	    disassembler.disassemble(cpu.getPC(), 10)
-                	);
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Erreur CPU : " + ex.getMessage());
@@ -191,8 +206,9 @@ public class GUI extends JFrame {
         });
         contentPane.add(btnPasPas);
 
-        JButton btnReset = new JButton("Reset");
-        btnReset.setBounds(501, 0, 80, 20);
+        JButton btnReset = new JButton("Réinitialiser");
+        btnReset.setToolTipText("Réinitialiser le simulateur");
+        btnReset.setBounds(536, 0, 99, 20);
         btnReset.setFont(new Font("Rockwell Condensed", Font.BOLD, 14));
         btnReset.addActionListener(e -> {
             cpu.reset();
@@ -204,7 +220,7 @@ public class GUI extends JFrame {
 
         // === TITRE PANEL CPU ===
         JLabel title = new JLabel("Architecture interne du 6809");
-        title.setBounds(827, 2, 394, 25);
+        title.setBounds(782, 17, 394, 25);
         title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(new Color(0, 0, 160));
@@ -212,17 +228,75 @@ public class GUI extends JFrame {
 
         // === PANEL CPU ===
         cpuPanel = new CPUPanel6809(cpu);
+        cpuPanel.lblCycles.setForeground(new Color(136, 4, 37));
+        cpuPanel.lblCycles.setBackground(new Color(255, 255, 255));
+        cpuPanel.lblX.setText(" 0000");
+        cpuPanel.lblY.setText(" 0000");
+        cpuPanel.lblDP.setText(" 0000");
+        cpuPanel.lblB.setText(" 0000");
+        cpuPanel.lblA.setText(" 0000");
+        cpuPanel.lblU.setText(" 0000");
+        cpuPanel.lblS.setText(" 0000");
+        cpuPanel.lblPC.setText(" 0000");
+        cpuPanel.setToolTipText("");
+        cpuPanel.lblCycles.setText(" 00");
+        cpuPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         cpuPanel.setForeground(new Color(224, 222, 224));
         cpuPanel.setBackground(new Color(224, 222, 224));
-        cpuPanel.setBounds(839, 37, 394, 430);
-        cpuPanel.lblY.setBounds(220, 330, 106, 30);
-        cpuPanel.lblU.setBounds(220, 90, 97, 30);
-        cpuPanel.lblS.setBounds(70, 90, 106, 30);
-        cpuPanel.lblA.setBounds(70, 150, 69, 30);
-        cpuPanel.lblB.setBounds(70, 200, 69, 30);
-        cpuPanel.lblX.setBounds(70, 330, 106, 30);
-        cpuPanel.lblDP.setBounds(70, 260, 106, 30);
+        cpuPanel.setBounds(815, 38, 350, 429);
         contentPane.add(cpuPanel);
+        GroupLayout gl_cpuPanel = new GroupLayout(cpuPanel);
+        gl_cpuPanel.setHorizontalGroup(
+        	gl_cpuPanel.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(96)
+        			.addComponent(cpuPanel.lblPC, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(66)
+        			.addComponent(cpuPanel.lblS, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+        			.addGap(44)
+        			.addComponent(cpuPanel.lblU, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(66)
+        			.addComponent(cpuPanel.lblA, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(66)
+        			.addComponent(cpuPanel.lblB, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(66)
+        			.addComponent(cpuPanel.lblDP, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(66)
+        			.addComponent(cpuPanel.lblX, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+        			.addGap(44)
+        			.addComponent(cpuPanel.lblY, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE))
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(116)
+        			.addComponent(cpuPanel.lblCycles, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
+        );
+        gl_cpuPanel.setVerticalGroup(
+        	gl_cpuPanel.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_cpuPanel.createSequentialGroup()
+        			.addGap(16)
+        			.addComponent(cpuPanel.lblPC, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        			.addGap(40)
+        			.addGroup(gl_cpuPanel.createParallelGroup(Alignment.LEADING)
+        				.addComponent(cpuPanel.lblS, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(cpuPanel.lblU, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE))
+        			.addGap(30)
+        			.addComponent(cpuPanel.lblA, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        			.addGap(20)
+        			.addComponent(cpuPanel.lblB, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        			.addGap(30)
+        			.addComponent(cpuPanel.lblDP, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        			.addGap(40)
+        			.addGroup(gl_cpuPanel.createParallelGroup(Alignment.LEADING)
+        				.addComponent(cpuPanel.lblX, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(cpuPanel.lblY, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE))
+        			.addGap(20)
+        			.addComponent(cpuPanel.lblCycles, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE))
+        );
+        cpuPanel.setLayout(gl_cpuPanel);
 
         // === TABLE ROM ===
         scrollPaneROM = new JScrollPane();
