@@ -78,9 +78,8 @@ public class GUI extends JFrame {
                 scrollConsole.setViewportView(consoleArea);
                 consoleArea.setFont(new Font("Consolas", Font.PLAIN, 13));
                 consoleArea.setEditable(false);
-                consoleArea.setText(
-                	    disassembler.disassemble(0xFC00, 20)
-                		);
+
+
                 consoleArea.setText(
                 	    disassembler.disassemble(cpu.getPC(), 10)
                 	);
@@ -132,10 +131,15 @@ public class GUI extends JFrame {
         btnAssemble.addActionListener(e -> {
             assembler.assembleAndLoad(textArea.getText(), memory);
             cpu.reset();
+
             cpuPanel.refresh();
             refreshROM();
-        } );
-       
+
+            consoleArea.setText(
+                disassembler.disassemble(cpu.getPC(), 10)
+            );
+        });
+
 
 
         contentPane.add(btnAssemble);
