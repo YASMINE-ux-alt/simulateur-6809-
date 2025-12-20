@@ -219,7 +219,7 @@ public class GUI extends JFrame {
         contentPane.add(btnReset);
 
         // === TITRE PANEL CPU ===
-        JLabel title = new JLabel("Architecture interne du 6809");
+        JLabel title = new JLabel("Architecture interne ");
         title.setBounds(782, 17, 394, 25);
         title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
