@@ -503,6 +503,14 @@ public class Assembler {
                         writeByte.accept(v & 0xFF);
                     }
                     continue;
+                    //CLRA
+                case "CLRA":
+                    writeByte.accept(0x4F);
+                    continue;
+                    //CLRB
+                case "CLRB":
+                    writeByte.accept(0x5F);
+                    continue;
 
                 // ----------------------
                 // JMP / JSR
