@@ -26,7 +26,7 @@ public class CPUPanel6809 extends JPanel {
         Font font = new Font("Consolas", Font.BOLD, 18);
         Color blue = new Color(0, 0, 255);
 
-        // === REGISTRES ===
+        // REGISTRES 
         lblPC = makeValueLabel(100, 20, font, blue);
         lblS  = makeValueLabel(70, 90, font, blue);
         lblU  = makeValueLabel(220, 90, font, blue);
@@ -54,7 +54,7 @@ public class CPUPanel6809 extends JPanel {
 
         add(makeNameLabel("E F H I N Z V C", 180, 240, new Font("Arial", Font.BOLD, 14)));
 
-        // === FLAGS ===
+        // FLAGS 
         lblE = makeFlagLabel(180, 270);
         lblF = makeFlagLabel(200, 270);
         lblH = makeFlagLabel(220, 270);
@@ -68,7 +68,7 @@ public class CPUPanel6809 extends JPanel {
         add(lblN); add(lblZ); add(lblV); add(lblC);
     }
 
-    // === Méthodes utilitaires ===
+    // Méthodes utilitaires 
     private JLabel makeValueLabel(int x, int y, Font f, Color c) {
         JLabel lbl = new JLabel("0000");
         lbl.setBounds(x, y, 120, 30);
@@ -114,7 +114,7 @@ public class CPUPanel6809 extends JPanel {
         g2.drawString("UAL", 155, 195);
     }
 
-    // === MISE À JOUR ===
+    //  MISE À JOUR 
     public void refresh() {
         lblA.setText(String.format("%02X", cpu.getA()));
         lblB.setText(String.format("%02X", cpu.getB()));
