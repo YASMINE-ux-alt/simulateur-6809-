@@ -62,13 +62,13 @@ public class Debugger {
     // Exécution continue jusqu'à un breakpoint
     public void run() {
         running = true;
-        System.out.println("▶ Exécution démarrée");
+        System.out.println("Exécution démarrée");
 
         while (running) {
 
             int pc = cpu.getPC();
             if (isBreakpoint(pc)) {
-                System.out.println("⛔ Breakpoint atteint @ " + hex(pc));
+                System.out.println(" Breakpoint atteint @ " + hex(pc));
                 dumpRegisters();
                 running = false;
                 break;
@@ -77,13 +77,13 @@ public class Debugger {
             cpu.step();
         }
 
-        System.out.println("■ Exécution stoppée");
+        System.out.println("Exécution stoppée");
     }
 
     // Arrête l’exécution
     public void stop() {
         running = false;
-        System.out.println("■ Stop demandé");
+        System.out.println(" Stop demandé");
     }
 
     // ============================================
