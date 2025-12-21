@@ -22,9 +22,8 @@ public class Debugger {
         this.mem = mem;
     }
 
-    // ============================================
+    
     // BREAKPOINTS
-    // ============================================
 
     public void addBreakpoint(int addr) {
         addr &= 0xFFFF;
@@ -42,9 +41,7 @@ public class Debugger {
         return breakpoints.contains(addr & 0xFFFF);
     }
 
-    // ============================================
     // EXÉCUTION
-    // ============================================
 
     // Exécute une seule instruction (pas à pas)
     public void step() {
@@ -86,9 +83,7 @@ public class Debugger {
         System.out.println(" Stop demandé");
     }
 
-    // ============================================
     // INSPECTION
-    // ============================================
 
     public void dumpRegisters() {
         System.out.println("-----------------------------");
@@ -143,9 +138,7 @@ public class Debugger {
     }
 
 
-    // ============================================
     // FORMATAGE
-    // ============================================
 
     private String hex(int v) {
         return String.format("%04X", v & 0xFFFF);
@@ -155,3 +148,4 @@ public class Debugger {
         return String.format("%02X", v & 0xFF);
     }
 }
+
