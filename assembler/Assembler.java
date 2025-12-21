@@ -65,7 +65,7 @@ public class Assembler {
         }
 
         try {
-            // ----- INHERENT / NOP / RTS -----
+            // INHERENT / NOP / RTS 
             if (mnemonic.equals("NOP")) {
                 writeByte.accept(0x12);
                 continue;
@@ -75,7 +75,7 @@ public class Assembler {
                 continue;
             }
 
-            // ----- Helpers pour détecter mode d'adressage -----
+            //  Helpers pour détecter mode d'adressage 
             boolean isImmediate = operand != null && operand.startsWith("#");
 
             boolean isIndexed = operand != null && operand.matches("^.*?,\\s*[xXyY]$");
@@ -126,11 +126,9 @@ public class Assembler {
             // utilitaire pour écrire direct (1 octet) ou extended (2 octets) adresse
             java.util.function.Function<String, Integer> asNumber = (opnd) -> parseNumber.apply(opnd);
 
-            // ----- SWITCH sur mnemonique -----
+            // SWITCH sur mnemonique 
             switch (mnemonic) {
-                // ----------------------
                 // LOADS  (LDA, LDB, LDX, LDU)
-                // ----------------------
                 case "LDA":
                     if (isImmediate) {
                         writeByte.accept(0x86);
@@ -207,9 +205,7 @@ public class Assembler {
                     }
                     continue;
 
-                // ----------------------
                 // STORE (STA, STB, STX, STU)
-                // ----------------------
                 case "STA":
                     if (isDirect) {
                         writeByte.accept(0x97);
@@ -270,9 +266,8 @@ public class Assembler {
                     }
                     continue;
 
-                // ----------------------
+                
                 // ARITHMETIC (ADDA/ADDB/SUBA/SUBB)
-                // ----------------------
                 case "ADDA":
                     if (isImmediate) {
                         writeByte.accept(0x8B);
@@ -345,9 +340,7 @@ public class Assembler {
                     }
                     continue;
 
-                // ----------------------
                 // LOGIC (ANDA/ANDB/ORA/ORB/EORA/EORB)
-                // ----------------------
                 case "ANDA":
                     if (isImmediate) {
                         writeByte.accept(0x84);
@@ -448,9 +441,7 @@ public class Assembler {
                     }
                     continue;
 
-                // ----------------------
                 // INC / DEC / CLR / NEG
-                // ----------------------
                 case "INC":
                     if (isDirect) {
                         writeByte.accept(0x0C);
@@ -538,9 +529,7 @@ public class Assembler {
                     }
                     continue;
 
-                // ----------------------
                 // JMP / JSR
-                // ----------------------
                 case "JMP":
                     if (isDirect) {
                         writeByte.accept(0x0E);
@@ -572,9 +561,7 @@ public class Assembler {
                     continue;
               
 
-                // ----------------------
                 // STACK: PSHS / PULS / PSHU / PULU
-                // ----------------------
                 case "PSHS":
                     writeByte.accept(0x34);
                     writeByte.accept(parseStackMask(operand));
@@ -602,7 +589,7 @@ public class Assembler {
         }
     }
 
-    // === Vecteur RESET ===
+    //  Vecteur RESET
     memory.writeByte(0xFFFE, 0xFC);
     memory.writeByte(0xFFFF, 0x00);
 
@@ -626,4 +613,5 @@ public class Assembler {
 	    }
 	    return mask;
 	}}
+
 
