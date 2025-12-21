@@ -498,6 +498,14 @@ public class Assembler {
                 case "DECB":
                     writeByte.accept(0x5A);
                     continue; 
+					 //CLRA
+                case "CLRA":
+                    writeByte.accept(0x4F);
+                    continue;
+                    //CLRB
+                case "CLRB":
+                    writeByte.accept(0x5F);
+                    continue;
                     
                 case "CLR":
                     if (isDirect) {
@@ -513,6 +521,7 @@ public class Assembler {
                         writeByte.accept(v & 0xFF);
                     }
                     continue;
+					
 
                 case "NEG":
                     if (isDirect) {
@@ -617,3 +626,4 @@ public class Assembler {
 	    }
 	    return mask;
 	}}
+
