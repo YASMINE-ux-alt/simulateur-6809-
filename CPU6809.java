@@ -909,14 +909,7 @@ public class CPU6809 {
         	        cpu.setA(r);
         	        cpu.updateFlagsLogic(r);
         	    });
-        opcodes[0xAA] = new Instruction("ORA", 0xAA, 2, 4, IDX,
-        	    cpu -> {
-        	        int addr = cpu.indexedAddress();
-        	        int v = cpu.readByte(addr);
-        	        int r = cpu.getA() | v;
-        	        cpu.setA(r);
-        	        cpu.updateFlagsLogic(r);
-        	    });
+
         opcodes[0xAA] = new Instruction("ORA", 0xAA, 2, 4, IDX,
         	    cpu -> {
         	        int addr = cpu.indexedAddress();
