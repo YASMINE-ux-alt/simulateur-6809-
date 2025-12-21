@@ -395,10 +395,12 @@ public class Assembler {
                         writeByte.accept(0xAA);
                         emitIndexed.accept(operand);
                     } else {
-                        // Some assemblers map ORA ext -> 0xBA but your CPU table didn't include; use IDX/EXT if present.
-                        writeByte.accept(0xAA);
-                        emitIndexed.accept(operand); // fallback
+                        writeByte.accept(0xBA); // ORA EXT
+                        int v = asNumber.apply(operand) & 0xFFFF;
+                        writeByte.accept((v >> 8) & 0xFF);
+                        writeByte.accept(v & 0xFF);
                     }
+
                     continue;
 
                 case "ORB":
