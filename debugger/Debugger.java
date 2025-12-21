@@ -100,7 +100,7 @@ public class Debugger {
         System.out.println("-----------------------------");
     }
 
-    // Dump mémoire RAM en HEX (
+    // Dump mémoire RAM en HEX 
     public void dumpRAM(int start, int length) {
         start &= 0xFFFF;
         System.out.println("=== RAM Dump ===");
@@ -148,4 +148,5 @@ public class Debugger {
         return String.format("%02X", v & 0xFF);
     }
 }
+
 
