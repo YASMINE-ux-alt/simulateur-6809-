@@ -1,4 +1,7 @@
-# simulateur-6809-
+# Simulateur du microprocesseur Motorola 6809
+
+Ce projet consiste à concevoir et développer un simulateur du microprocesseur **Motorola 6809** en langage **Java**, dans le cadre d’un projet universitaire du module Architecture des ordinateurs.
+
 Instructions existantes :
 
 1. LOAD 
