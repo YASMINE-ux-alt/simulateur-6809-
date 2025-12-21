@@ -14,6 +14,8 @@ public class CPUPanel6809 extends JPanel {
     // Labels des flags
     private JLabel lblE, lblF, lblH, lblI, lblN, lblZ, lblV, lblC;
 
+    public JLabel lblCycles;
+
     public CPUPanel6809(CPU6809 cpu) {
         this.cpu = cpu;
 
@@ -36,6 +38,8 @@ public class CPUPanel6809 extends JPanel {
         lblX  = makeValueLabel(70, 330, font, blue);
         lblY  = makeValueLabel(220, 330, font, blue);
 
+        lblCycles = makeValueLabel(120, 380, font, blue);
+
         // === LABELS TEXTUELS ===
         add(makeNameLabel("PC", 20, 20));
         add(makeNameLabel("S",  20, 90));
@@ -45,6 +49,7 @@ public class CPUPanel6809 extends JPanel {
         add(makeNameLabel("DP", 20, 260));
         add(makeNameLabel("X",  20, 330));
         add(makeNameLabel("Y", 180, 330));
+        add(makeNameLabel("CYCLES", 20, 380));
 
         add(makeNameLabel("E F H I N Z V C", 180, 240, new Font("Arial", Font.BOLD, 14)));
 
@@ -118,6 +123,7 @@ public class CPUPanel6809 extends JPanel {
         lblU.setText(String.format("%04X", cpu.getU()));
         lblPC.setText(String.format("%04X", cpu.getPC()));
         lblDP.setText(String.format("%02X", cpu.getDP()));
+        lblCycles.setText(String.valueOf(cpu.getCycles()));
 
         updateFlags(cpu);
     }
