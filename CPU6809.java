@@ -551,6 +551,18 @@ public class CPU6809 {
                     cpu.updateNZ16(cpu.getX());
                     cpu.clearV();
                 });
+        
+     // CLRA - Opcode 4F (Inhérent)
+        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setA(0);
+            cpu.updateFlagsCLR();
+        });
+
+        // CLRB - Opcode 5F (Inhérent)
+        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setB(0);
+            cpu.updateFlagsCLR();
+        });
 
         // --- STU ---
         opcodes[0xDF] = new Instruction("STU", 0xDF, 2, 4, DIR,
