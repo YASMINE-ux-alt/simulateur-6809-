@@ -551,18 +551,6 @@ public class CPU6809 {
                     cpu.updateNZ16(cpu.getX());
                     cpu.clearV();
                 });
-        
-     // CLRA - Opcode 4F (Inhérent)
-        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
-            cpu.setA(0);
-            cpu.updateFlagsCLR();
-        });
-
-        // CLRB - Opcode 5F (Inhérent)
-        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
-            cpu.setB(0);
-            cpu.updateFlagsCLR();
-        });
 
         // --- STU ---
         opcodes[0xDF] = new Instruction("STU", 0xDF, 2, 4, DIR,
@@ -784,6 +772,30 @@ public class CPU6809 {
         	        cpu.writeByte(addr, r);
         	        cpu.updateFlagsDec(r);
         	    });
+     // --- INCA / INCB ---
+        opcodes[0x4C] = new Instruction("INCA", 0x4C, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            int res = (cpu.getA() + 1) & 0xFF;
+            cpu.setA(res);
+            cpu.updateFlagsInc(res);
+        });
+        opcodes[0x5C] = new Instruction("INCB", 0x5C, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            int res = (cpu.getB() + 1) & 0xFF;
+            cpu.setB(res);
+            cpu.updateFlagsInc(res);
+        });
+
+        // --- DECA / DECB ---
+        opcodes[0x4A] = new Instruction("DECA", 0x4A, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            int res = (cpu.getA() - 1) & 0xFF;
+            cpu.setA(res);
+            cpu.updateFlagsDec(res);
+        });
+        opcodes[0x5A] = new Instruction("DECB", 0x5A, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            int res = (cpu.getB() - 1) & 0xFF;
+            cpu.setB(res);
+            cpu.updateFlagsDec(res);
+        });
+        //
 //CLR
 
 
