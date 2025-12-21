@@ -8,14 +8,14 @@ import memory.Memory;
 public class Assembler {
     public void assembleAndLoad(String src, Memory memory) {
     	
-    int addr = 0xFC00;       // Début ROM (comme ton CPU)
+    int addr = 0xFC00;       // Début ROM 
     String[] lines = src.split("\n");
 
     // Effacer la ROM avant de charger
     for (int i = 0xFC00; i <= 0xFFFF; i++)
         memory.writeByte(i, 0x00);
 
-    // Helper lambdas (Java 8-compatible)
+    
     AtomicInteger cursor = new AtomicInteger(0xFC00);
 
  // writeByte
@@ -53,7 +53,7 @@ public class Assembler {
         if (line.isEmpty() || line.startsWith(";"))
             continue;
 
-        // séparer mnemonic + operande (si existante)
+        // séparer mnemonic + operande 
         String mnemonic;
         String operand = null;
         int sp = line.indexOf(' ');
@@ -75,7 +75,7 @@ public class Assembler {
                 continue;
             }
 
-            //  Helpers pour détecter mode d'adressage 
+            //pour détecter mode d'adressage 
             boolean isImmediate = operand != null && operand.startsWith("#");
 
             boolean isIndexed = operand != null && operand.matches("^.*?,\\s*[xXyY]$");
@@ -87,7 +87,7 @@ public class Assembler {
             boolean isDirect = operand != null && !isImmediate && !isIndexed &&
                                !isExtended && parseNumber.apply(operand) <= 0xFF;
    
-            // utilitaire pour écrire indexed postbyte + offset si nécessaire
+            
             java.util.function.Consumer<String> emitIndexed = (opnd) -> {
                 // opnd example: ",X" or "5,X" or "$05,X" or "$1234,X"
                 String o = opnd.trim();
@@ -117,13 +117,13 @@ public class Assembler {
                 }
             };
 
-            // utilitaire pour déterminer valeur immédiate (sans '#')
+            //déterminer valeur immédiate 
             java.util.function.Function<String, Integer> immValue = (opnd) -> {
                 String x = opnd.substring(1).trim(); // enlever '#'
                 return parseNumber.apply(x);
             };
 
-            // utilitaire pour écrire direct (1 octet) ou extended (2 octets) adresse
+            //écrire direct (1 octet) ou extended (2 octets)
             java.util.function.Function<String, Integer> asNumber = (opnd) -> parseNumber.apply(opnd);
 
             // SWITCH sur mnemonique 
@@ -613,5 +613,6 @@ public class Assembler {
 	    }
 	    return mask;
 	}}
+
 
 
