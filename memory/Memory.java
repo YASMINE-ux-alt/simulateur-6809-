@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 public class Memory {
 
-    private final byte[] mem = new byte[65536]; // 64 Ko de RAM
+    private final byte[] mem = new byte[65536]; 
 
-    // === Interfaces pour E/S mappées ===
+    //Interfaces pour E/S mappées
     public interface ConsoleOutListener {
         void onConsoleOut(byte b);
     }
@@ -26,13 +26,11 @@ public class Memory {
         this.consoleInProvider = p;
     }
 
-    // ============================================================
-    // LECTURE / ÉCRITURE OCTET
-    // ============================================================
+    // LECTURE / ÉCRITURE 
     public int readByte(int addr) {
         addr &= 0xFFFF;
 
-        // Port d’entrée console FF01
+        // Port d entrée console FF01
         if (addr == 0xFF01 && consoleInProvider != null) {
             return consoleInProvider.readConsoleIn() & 0xFF;
         }
@@ -49,13 +47,12 @@ public class Memory {
             consoleOutListener.onConsoleOut((byte) value);
         }
 
-        // On garde quand même la valeur en mémoire
+        // on laisse la valeur dans la memoire
         mem[addr] = (byte) value;
     }
 
-    // ============================================================
-    // LECTURE / ÉCRITURE DE MOT 16 bits (Big Endian)
-    // ============================================================
+    // LECTURE / ÉCRITURE 
+    
     public int readWord(int addr) {
         addr &= 0xFFFF;
 
@@ -72,9 +69,9 @@ public class Memory {
         writeByte(addr + 1, value & 0xFF);        // octet bas
     }
 
-    // ============================================================
+    
     // CHARGER UN PROGRAMME
-    // ============================================================
+   
     public void loadProgram(byte[] program, int startAddress) {
         startAddress &= 0xFFFF;
 
@@ -86,16 +83,15 @@ public class Memory {
         System.arraycopy(program, 0, mem, startAddress, program.length);
     }
 
-    // ============================================================
-    // EFFACER MÉMOIRE COMPLÈTE
-    // ============================================================
+    
+    // EFFACER LA MEMOIRE COMPLETE
+    
     public void clearMemory() {
         Arrays.fill(mem, (byte) 0);
     }
 
-    // ============================================================
-    // DUMP MÉMOIRE (pour debugger)
-    // ============================================================
+    
+    // DUMP MEMOIRE 
     public String memoryDump(int start, int length) {
         start &= 0xFFFF;
         int end = Math.min(start + length, 65536);
@@ -112,7 +108,7 @@ public class Memory {
 
             sb.append(" | ");
 
-            // caractères lisibles
+            // caracteres
             for (int i = 0; i < 16 && addr + i < end; i++) {
                 char c = (char) (mem[addr + i] & 0xFF);
                 sb.append((c >= 32 && c <= 126) ? c : '.');
@@ -124,9 +120,8 @@ public class Memory {
         return sb.toString();
     }
 
-    // ============================================================
-    // LECTURE MULTIPLE (utilisé par debugger)
-    // ============================================================
+   
+    // LECTURE multiple 
     public int[] readBytes(int start, int length) {
         start &= 0xFFFF;
         length = Math.min(length, 65536 - start);
@@ -140,3 +135,4 @@ public class Memory {
         return data;
     }
 }
+
