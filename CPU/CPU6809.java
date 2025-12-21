@@ -796,6 +796,17 @@ public class CPU6809 {
             cpu.updateFlagsDec(res);
         });
         //
+        // CLRA 
+        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setA(0);
+            cpu.updateFlagsCLR();
+        });
+
+        // CLRB 
+        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setB(0);
+            cpu.updateFlagsCLR();
+        });
 //CLR
 
 
