@@ -20,7 +20,7 @@ public class GUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    // ===== CPU / MEMOIRE =====
+    // CPU / MEMOIRE
     private Memory memory;
     private CPU6809 cpu;
     private Debugger debugger;
@@ -360,5 +360,6 @@ public class GUI extends JFrame {
         }
     }
 }
+
 
 
