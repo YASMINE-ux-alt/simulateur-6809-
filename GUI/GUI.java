@@ -30,27 +30,27 @@ public class GUI extends JFrame {
     private JTextArea consoleArea;
 
   
-    // ===== CONTROLE EXECUTION =====
+    //CONTROLE EXECUTION 
     private boolean running = false;
     private SwingWorker<Void, Void> worker;
 
-    // ===== PANELS =====
+    // PANEL
     private JPanel contentPane;
     private JScrollPane scrollPaneROM;
     private JScrollPane scrollPaneRAM;
 
-    // ===== TABLES =====
+    // TABLES 
     private JTable tableROM;
     private JTable tableRAM;
 
-    // ===== PANEL CPU =====
+    // PANEL CPU 
     private CPUPanel6809 cpuPanel;
-    //=======LABEL CONSOLE=======
+//LABEL CONSOLE
 
 
     public GUI() {
 
-        // === INIT CPU ===
+        //  INIT CPU
         memory = new Memory();
         cpu = new CPU6809(memory);
         debugger = new Debugger(cpu, memory);
@@ -60,7 +60,7 @@ public class GUI extends JFrame {
 
         cpu.reset();
 
-        // === FENÊTRE ===
+        // FENÊTRE 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1308, 882);
 
@@ -69,7 +69,7 @@ public class GUI extends JFrame {
         contentPane.setBorder(new TitledBorder(null, "Editeur du programme", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-     // === CONSOLE DÉSASSEMBLEUR ===
+     // CONSOLE DÉSASSEMBLEUR 
         JScrollPane scrollConsole = new JScrollPane();
         scrollConsole.setBounds(0, 494, 350, 182);
         contentPane.add(scrollConsole);
@@ -84,7 +84,7 @@ public class GUI extends JFrame {
                 	    disassembler.disassemble(cpu.getPC(), 10)
                 	);
 
-        // === ZONE CODE ===
+        // ZONE CODE 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(0, 23, 216, 444);
         contentPane.add(scrollPane);
@@ -93,7 +93,7 @@ public class GUI extends JFrame {
         textArea.setFont(new Font("Arial Black", Font.BOLD, 13));
         scrollPane.setViewportView(textArea);
 
-        // === BOUTONS ===
+        //    BOUTONS 
         JButton BtnNew = new JButton("Nouveau");
         BtnNew.setToolTipText("un nouveau programme");
         BtnNew.setBounds(0, 0, 64, 20);
@@ -161,13 +161,10 @@ public class GUI extends JFrame {
                     while (running) {
                         cpu.step();
 
-                        // 👇 TOUT CE QUI TOUCHE À SWING ICI
                         SwingUtilities.invokeLater(() -> {
                             cpuPanel.refresh();
                             refreshRAM();
                             refreshROM();
-
-                            // 👇 ICI EXACTEMENT
                             consoleArea.setText(
                                 disassembler.disassemble(cpu.getPC(), 10)
                             );
@@ -222,7 +219,7 @@ public class GUI extends JFrame {
         });
         contentPane.add(btnReset);
 
-        // === TITRE PANEL CPU ===
+        //  TITRE PANEL CPU 
         JLabel title = new JLabel("Architecture interne ");
         title.setBounds(782, 17, 394, 25);
         title.setFont(new Font("Rockwell Condensed", Font.BOLD, 18));
@@ -230,7 +227,7 @@ public class GUI extends JFrame {
         title.setForeground(new Color(0, 0, 160));
         contentPane.add(title);
 
-        // === PANEL CPU ===
+        //   PANEL CPU 
         cpuPanel = new CPUPanel6809(cpu);
         cpuPanel.lblCycles.setForeground(new Color(136, 4, 37));
         cpuPanel.lblCycles.setBackground(new Color(255, 255, 255));
@@ -302,7 +299,7 @@ public class GUI extends JFrame {
         );
         cpuPanel.setLayout(gl_cpuPanel);
 
-        // === TABLE ROM ===
+        //  TABLE ROM 
         scrollPaneROM = new JScrollPane();
         scrollPaneROM.setBounds(235, 28, 115, 174);
         contentPane.add(scrollPaneROM);
@@ -318,7 +315,7 @@ public class GUI extends JFrame {
         tableROM.setModel(modelROM);
         scrollPaneROM.setVisible(false);
 
-        // === TABLE RAM ===
+        //  TABLE RAM 
         scrollPaneRAM = new JScrollPane();
         scrollPaneRAM.setBounds(360, 30, 115, 172);
         contentPane.add(scrollPaneRAM);
@@ -344,7 +341,7 @@ public class GUI extends JFrame {
         
     }
 
-    // === MISE À JOUR MEMOIRE ===
+    //  MISE À JOUR MEMOIRE 
     private void refreshRAM() {
         DefaultTableModel model = (DefaultTableModel) tableRAM.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -363,4 +360,5 @@ public class GUI extends JFrame {
         }
     }
 }
+
 
