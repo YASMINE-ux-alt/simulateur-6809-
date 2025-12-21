@@ -27,7 +27,7 @@ public class CPU6809 {
     // Compteur de cycles
     private long cycles = 0;
 
-    // Flags dans CCR : bit (de MSB à LSB) = E F H I N Z V C
+    // Flags dans CCR 
     private static final int FLAG_E = 0x80;
     private static final int FLAG_F = 0x40;
     private static final int FLAG_H = 0x20;
@@ -154,7 +154,7 @@ public class CPU6809 {
         return ((hi << 8) | lo) & 0xFFFF;
     }
 
-    //      Reset 
+    //Reset 
     public void reset() {
         A = B = DP = CCR = 0;
         X = Y = S = U = 0;
@@ -163,7 +163,7 @@ public class CPU6809 {
  // ou lire FFFE/FFFF si tu veux respecter le vecteur
     }
 
-    //      Modes d'adressage 
+    //  Modes d'adressage 
     public int imm8() {
         return fetch8();
     }
@@ -182,15 +182,7 @@ public class CPU6809 {
         return fetch16();
     }
 
-    /**
-     * Indexed addressing (X/Y) — version simplifiée
-     * Postbyte :
-     *   bit 5 : R (0 = X, 1 = Y)
-     *   modes supportés ici :
-     *     0x00 : ,R
-     *     0x08 : offset8,R
-     *     0x09 : offset16,R
-     */
+   
     public int indexedAddress() {
         int post = fetch8();
         boolean useY = (post & 0b0010_0000) != 0;
@@ -331,7 +323,7 @@ public class CPU6809 {
         setFlag(FLAG_V, value == 0x80);
     }
 
-    //  Construction du tableau d'instructions 
+    // tableau d'instructions 
     private void buildInstructionTable() {
         Instruction.AddressingMode IM8  = Instruction.AddressingMode.IMMEDIATE8;
         Instruction.AddressingMode IM16 = Instruction.AddressingMode.IMMEDIATE16;
@@ -340,7 +332,7 @@ public class CPU6809 {
         Instruction.AddressingMode EXT  = Instruction.AddressingMode.EXTENDED;
         Instruction.AddressingMode INH  = Instruction.AddressingMode.INHERENT;
 
-        // 1. LOAD / STORE
+        // 1. LOAD 
 
         //    LDA 
         opcodes[0x86] = new Instruction("LDA", 0x86, 2, 2, IM8,
