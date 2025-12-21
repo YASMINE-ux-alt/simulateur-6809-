@@ -1,48 +1,13 @@
-# Simulateur du microprocesseur Motorola 6809
+# Simulateur Motorola 6809
+Ce projet consiste à développer un simulateur logiciel du microprocesseur Motorola 6809.
+Il permet de comprendre le fonctionnement interne du processeur, l’exécution des instructions
+assembleur, la gestion des registres et l’accès à la mémoire.
 
-Ce projet consiste à concevoir et développer un simulateur du microprocesseur **Motorola 6809** en langage **Java**, dans le cadre d’un projet universitaire du module Architecture des ordinateurs.
-
-Instructions existantes :
-
-1. LOAD 
-- LDA 
-- LDB 
-- LDX 
-- LDU 
-- STA 
-- STB 
-- STX 
-- STU 
-2. ARITHMÉTIQUE
-- ADDA 
-- ADDB 
-- SUBA 
-- SUBB 
-- INC
-- INCA
-- INCB
-- DEC
-- DECA
-- DECB
-- CLR
-- CLRA
-- CLRB
-- NEG 
-3. LOGIC
-- ANDA 
-- ANDB 
-- ORA 
-- ORB 
-- EORA 
-- EORB 
-4. BRANCH / JUMP / CALL
-- JMP
-- JSR 
-- RTS
-5. STACK OPERATIONS
-- PSHS
-- PULS
-- PSHU
-- PULU
-6. AUTRE
-- NOP
+# Technologies utilisées
+- Java
+- Swing (interface graphique)
+- Git & GitHub
+#  Réalisé par
+- Nom : Yasmine Naam /Salma Rachid
+- Filière : GI
+- Encadrant : Pr. Hicham BENALLA                          
