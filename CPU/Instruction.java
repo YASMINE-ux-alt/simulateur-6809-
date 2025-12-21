@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 public class Instruction {
 
     // Modes d’adressage supportés
-    // 
+ 
     public enum AddressingMode {
         IMMEDIATE8,
         IMMEDIATE16,
@@ -15,9 +15,9 @@ public class Instruction {
         INHERENT
     }
 
-    // 
+  
     // Données de l’instruction
-    // 
+   
     private final String mnemonic;
     private final int opcode;     //
     private final int size;
@@ -25,9 +25,9 @@ public class Instruction {
     private final AddressingMode mode;
     private final Consumer<CPU6809> executor;
 
-    // 
+   
     // Constructeur
-    // 
+    
     public Instruction(String mnemonic,
                        int opcode,
                        int size,
@@ -43,9 +43,9 @@ public class Instruction {
         this.executor = executor;
     }
 
-    //
+    
     // Getters
-    // 
+    
     public String getMnemonic() {
         return mnemonic;
     }
@@ -66,16 +66,16 @@ public class Instruction {
         return mode;
     }
 
-    // 
+    
     // Exécution
-    // -
+    
     public void execute(CPU6809 cpu) {
         executor.accept(cpu);
     }
 
-    // 
+    
     // Debug
-    // 
+    
     @Override
     public String toString() {
         return String.format(
@@ -84,4 +84,5 @@ public class Instruction {
         );
     }
 }
+
 
