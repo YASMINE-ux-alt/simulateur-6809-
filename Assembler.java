@@ -7,6 +7,7 @@ import memory.Memory;
 
 public class Assembler {
     public void assembleAndLoad(String src, Memory memory) {
+    	
     int addr = 0xFC00;       // Début ROM (comme ton CPU)
     String[] lines = src.split("\n");
 
@@ -27,6 +28,10 @@ public class Assembler {
      memory.writeByte(pos, (w >> 8) & 0xFF);
      memory.writeByte(cursor.getAndIncrement(), w & 0xFF);
  };
+ 
+ 
+ 
+
 
 
     // utilitaires internes
@@ -73,8 +78,9 @@ public class Assembler {
             // ----- Helpers pour détecter mode d'adressage -----
             boolean isImmediate = operand != null && operand.startsWith("#");
 
-            boolean isIndexed = operand != null && operand.matches("^.*,[xXyY]$");
+            boolean isIndexed = operand != null && operand.matches("^.*?,\\s*[xXyY]$");
 
+            
             boolean isExtended = operand != null && !isImmediate && !isIndexed &&
                                  parseNumber.apply(operand) > 0xFF;
 
@@ -458,7 +464,16 @@ public class Assembler {
                         writeByte.accept(v & 0xFF);
                     }
                     continue;
+                 // INCA 
+                case "INCA":
+                    writeByte.accept(0x4C);
+                    continue;
+                    // INCB
+                case "INCB":
+                    writeByte.accept(0x5C);
+                    continue;
 
+               
                 case "DEC":
                     if (isDirect) {
                         writeByte.accept(0x0A);
@@ -473,7 +488,15 @@ public class Assembler {
                         writeByte.accept(v & 0xFF);
                     }
                     continue;
-
+                    // DECA 
+                case "DECA":
+                    writeByte.accept(0x4A);
+                    continue;
+                    // DECB
+                case "DECB":
+                    writeByte.accept(0x5A);
+                    continue; 
+                    
                 case "CLR":
                     if (isDirect) {
                         writeByte.accept(0x0F);
@@ -502,14 +525,6 @@ public class Assembler {
                         writeByte.accept((v >> 8) & 0xFF);
                         writeByte.accept(v & 0xFF);
                     }
-                    continue;
-                    //CLRA
-                case "CLRA":
-                    writeByte.accept(0x4F);
-                    continue;
-                    //CLRB
-                case "CLRB":
-                    writeByte.accept(0x5F);
                     continue;
 
                 // ----------------------
@@ -551,19 +566,20 @@ public class Assembler {
                 // ----------------------
                 case "PSHS":
                     writeByte.accept(0x34);
-                    writeByte.accept(asNumber.apply(operand) & 0xFF);
+                    writeByte.accept(parseStackMask(operand));
                     continue;
                 case "PULS":
                     writeByte.accept(0x35);
-                    writeByte.accept(asNumber.apply(operand) & 0xFF);
+                    writeByte.accept(parseStackMask(operand));
+
                     continue;
                 case "PSHU":
                     writeByte.accept(0x36);
-                    writeByte.accept(asNumber.apply(operand) & 0xFF);
+                    writeByte.accept(parseStackMask(operand));
                     continue;
                 case "PULU":
                     writeByte.accept(0x37);
-                    writeByte.accept(asNumber.apply(operand) & 0xFF);
+                    writeByte.accept(parseStackMask(operand));
                     continue;
 
                 default:
@@ -580,4 +596,22 @@ public class Assembler {
     memory.writeByte(0xFFFF, 0x00);
 
     System.out.println("Programme assemblé et chargé !");
-}}
+}
+    int parseStackMask(String op) {
+	    int mask = 0;
+	    for (String r : op.split(",")) {
+	        switch (r.trim().toUpperCase()) {
+	            case "PC": mask |= 0x80; break;
+	            case "U":  mask |= 0x40; break;
+	            case "Y":  mask |= 0x20; break;
+	            case "X":  mask |= 0x10; break;
+	            case "DP": mask |= 0x08; break;
+	            case "B":  mask |= 0x04; break;
+	            case "A":  mask |= 0x02; break;
+	            case "CC": mask |= 0x01; break;
+	            default:
+	                throw new IllegalArgumentException("Registre pile inconnu : " + r);
+	        }
+	    }
+	    return mask;
+	}}
