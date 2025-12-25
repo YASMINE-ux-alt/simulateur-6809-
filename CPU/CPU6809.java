@@ -804,6 +804,23 @@ public class CPU6809 {
         	        cpu.writeByte(addr, 0);
         	        cpu.updateFlagsCLR();
         	    });
+     // CLRA
+        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, INH,
+        	    cpu -> {
+        	        cpu.setA(0x00);
+        	        cpu.updateFlagsCLR();
+        	    }
+        	);
+
+  // CLRB
+        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, INH,
+        	    cpu -> {
+        	        cpu.setB(0x00);
+        	        cpu.updateFlagsCLR();
+        	    }
+        	);
+
+
 // NEG
         opcodes[0x00] = new Instruction("NEG", 0x00, 2, 6, DIR,
                 cpu -> {
