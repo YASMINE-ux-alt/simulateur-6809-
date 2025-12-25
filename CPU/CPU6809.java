@@ -5,29 +5,28 @@ import memory.Memory;
 
 public class CPU6809 {
 
-    //    Registres 8 bits
-    private int A;      // Accumulateur A
-    private int B;      // Accumulateur B
-    private int DP;     // Direct Page
-    private int CCR;    // Condition Code Register
+    // registres 
+    private int A;     
+    private int B;      
+    private int DP;     
+    private int CCR;    
 
-    //  Registres 16 bits 
     private int X;
     private int Y;
-    private int S;      // Stack pointer système
-    private int U;      // Stack pointer utilisateur
-    private int PC;     // Program Counter
+    private int S;      
+    private int U;      
+    private int PC;     
 
-    //   Mémoire 
+    // declaration memoire 
     private final Memory memory;
 
-    //   Tableau d'opcodes (256 possibles) 
+    // === Tableau d'opcodes (256 possibles) ===
     private final Instruction[] opcodes = new Instruction[256];
 
     // Compteur de cycles
     private long cycles = 0;
 
-    // Flags dans CCR 
+    // Flags E F H I N Z V C
     private static final int FLAG_E = 0x80;
     private static final int FLAG_F = 0x40;
     private static final int FLAG_H = 0x20;
@@ -37,14 +36,15 @@ public class CPU6809 {
     private static final int FLAG_V = 0x02;
     private static final int FLAG_C = 0x01;
 
-    //    Constructeur 
+    // ====== Constructeur ======
     public CPU6809(Memory memory) {
         this.memory = memory;
-        reset();
+        reset(); //pour vider les registres 
         buildInstructionTable();
     }
 
-    //     Getters / setters registres 
+    //Getters / setters 
+    //0xFF taille de A 
     public int getA() { return A & 0xFF; }
     public void setA(int value) { A = value & 0xFF; }
 
@@ -87,12 +87,12 @@ public class CPU6809 {
     }
 
     
-    //    Gestion des flags 
+    //  Gestion des flags 
     private void setFlag(int flag, boolean value) {
         if (value) {
-            CCR |= flag;
+            CCR |= flag; // OU binaire
         } else {
-            CCR &= ~flag;
+            CCR &= ~flag; //~ inverseur  ET binaire
         }
     }
 
@@ -121,7 +121,7 @@ public class CPU6809 {
         setFlag(FLAG_N, (r & 0x8000) != 0);
     }
 
-    //      Mémoire 
+    // Mémoire
     public int readByte(int addr) {
         return memory.readByte(addr);
     }
@@ -141,7 +141,7 @@ public class CPU6809 {
         writeByte(addr + 1, value & 0xFF);
     }
 
-    //     Fetch 
+    // lecture des instructions
     private int fetch8() {
         int value = readByte(PC);
         PC = (PC + 1) & 0xFFFF;
@@ -154,16 +154,16 @@ public class CPU6809 {
         return ((hi << 8) | lo) & 0xFFFF;
     }
 
-    //Reset 
+    // Reset 
     public void reset() {
         A = B = DP = CCR = 0;
         X = Y = S = U = 0;
         cycles = 0;
         PC = readWord(0xFFFE);
- // ou lire FFFE/FFFF si tu veux respecter le vecteur
+ 
     }
 
-    //  Modes d'adressage 
+    //Modes d'adressage 
     public int imm8() {
         return fetch8();
     }
@@ -182,7 +182,7 @@ public class CPU6809 {
         return fetch16();
     }
 
-   
+    
     public int indexedAddress() {
         int post = fetch8();
         boolean useY = (post & 0b0010_0000) != 0;
@@ -214,7 +214,7 @@ public class CPU6809 {
     }
 
   
-    //     Pile S / U 
+    //Pile S / U 
     private void push8S(int value) {
         S = (S - 1) & 0xFFFF;
         writeByte(S, value);
@@ -259,8 +259,9 @@ public class CPU6809 {
         return ((high << 8) | low) & 0xFFFF;
     }
 
+    
 
-    // ADD 8 bits (ADDA, ADDB)
+    // ADD (ADDA, ADDB)
     private void updateFlagsAdd8(int a, int b, int result) {
         int r = result & 0xFF;
 
@@ -323,7 +324,7 @@ public class CPU6809 {
         setFlag(FLAG_V, value == 0x80);
     }
 
-    // tableau d'instructions 
+    // tableau d'instructions
     private void buildInstructionTable() {
         Instruction.AddressingMode IM8  = Instruction.AddressingMode.IMMEDIATE8;
         Instruction.AddressingMode IM16 = Instruction.AddressingMode.IMMEDIATE16;
@@ -332,9 +333,8 @@ public class CPU6809 {
         Instruction.AddressingMode EXT  = Instruction.AddressingMode.EXTENDED;
         Instruction.AddressingMode INH  = Instruction.AddressingMode.INHERENT;
 
-        // 1. LOAD 
 
-        //    LDA 
+        // --- LDA ---
         opcodes[0x86] = new Instruction("LDA", 0x86, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -367,7 +367,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //   LDB 
+        // --- LDB ---
         opcodes[0xC6] = new Instruction("LDB", 0xC6, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -400,7 +400,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //      LDX 
+        // --- LDX ---
         opcodes[0x8E] = new Instruction("LDX", 0x8E, 3, 3, IM16,
                 cpu -> {
                     int v = cpu.imm16();
@@ -433,7 +433,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //     LDU 
+        // --- LDU ---
         opcodes[0xCE] = new Instruction("LDU", 0xCE, 3, 3, IM16,
                 cpu -> {
                     int v = cpu.imm16();
@@ -466,7 +466,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //    STA
+        // --- STA ---
         opcodes[0x97] = new Instruction("STA", 0x97, 2, 4, DIR,
                 cpu -> {
                     int addr = cpu.directAddress();
@@ -491,7 +491,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //    STB
+        // --- STB ---
         opcodes[0xD7] = new Instruction("STB", 0xD7, 2, 4, DIR,
                 cpu -> {
                     int addr = cpu.directAddress();
@@ -516,7 +516,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //      STX 
+        // --- STX ---
         opcodes[0x9F] = new Instruction("STX", 0x9F, 2, 4, DIR,
                 cpu -> {
                     int addr = cpu.directAddress();
@@ -541,7 +541,7 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        //    STU 
+        // --- STU ---
         opcodes[0xDF] = new Instruction("STU", 0xDF, 2, 4, DIR,
                 cpu -> {
                     int addr = cpu.directAddress();
@@ -566,9 +566,9 @@ public class CPU6809 {
                     cpu.clearV();
                 });
 
-        // 2. ARITHMETIC
+       
 
-        //     ADDA 
+        // --- ADDA ---
         opcodes[0x8B] = new Instruction("ADDA", 0x8B, 2, 2, IM8,
                 cpu -> {
                     int a = cpu.getA();
@@ -608,7 +608,7 @@ public class CPU6809 {
                     cpu.updateFlagsAdd8(a, v, res);
                 });
 
-        //   ADDB 
+        // --- ADDB ---
         opcodes[0xCB] = new Instruction("ADDB", 0xCB, 2, 2, IM8,
                 cpu -> {
                     int b = cpu.getB();
@@ -648,7 +648,7 @@ public class CPU6809 {
                     cpu.updateFlagsAdd8(b, v, res);
                 });
 
-        // SUBA
+        // --- SUBA ---
         opcodes[0x80] = new Instruction("SUBA", 0x80, 2, 2, IM8,
                 cpu -> {
                     int a = cpu.getA();
@@ -684,11 +684,23 @@ public class CPU6809 {
         	        cpu.setA(res);
         	        cpu.updateFlagsSub8(a, v, res);
         	    });
+     // CLRA 
+        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setA(0);
+            cpu.updateFlagsCLR();
+        });
+
+        // CLRB 
+        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
+            cpu.setB(0);
+            cpu.updateFlagsCLR();
+        });
 
 
 
 
-        //   SUBB 
+
+        // --- SUBB ---
         opcodes[0xC0] = new Instruction("SUBB", 0xC0, 2, 2, IM8,
                 cpu -> {
                     int b = cpu.getB();
@@ -725,7 +737,7 @@ public class CPU6809 {
         	        cpu.updateFlagsSub8(b, v, res);
         	    });
 
-        // NC / DEC / CLR / NEG 
+        // INC 
         opcodes[0x0C] = new Instruction("INC", 0x0C, 2, 6, DIR,
                 cpu -> {
                     int addr = cpu.directAddress();
@@ -759,7 +771,7 @@ public class CPU6809 {
         	        cpu.writeByte(addr, r);
         	        cpu.updateFlagsDec(r);
         	    });
-     //    INCA / INCB 
+     // INCA / INCB 
         opcodes[0x4C] = new Instruction("INCA", 0x4C, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
             int res = (cpu.getA() + 1) & 0xFF;
             cpu.setA(res);
@@ -771,7 +783,7 @@ public class CPU6809 {
             cpu.updateFlagsInc(res);
         });
 
-        //     DECA / DECB
+        // DECA / DECB
         opcodes[0x4A] = new Instruction("DECA", 0x4A, 1, 2, Instruction.AddressingMode.INHERENT, cpu -> {
             int res = (cpu.getA() - 1) & 0xFF;
             cpu.setA(res);
@@ -782,7 +794,7 @@ public class CPU6809 {
             cpu.setB(res);
             cpu.updateFlagsDec(res);
         });
-        //
+      
 //CLR
 
 
@@ -804,23 +816,6 @@ public class CPU6809 {
         	        cpu.writeByte(addr, 0);
         	        cpu.updateFlagsCLR();
         	    });
-     // CLRA
-        opcodes[0x4F] = new Instruction("CLRA", 0x4F, 1, 2, INH,
-        	    cpu -> {
-        	        cpu.setA(0x00);
-        	        cpu.updateFlagsCLR();
-        	    }
-        	);
-
-  // CLRB
-        opcodes[0x5F] = new Instruction("CLRB", 0x5F, 1, 2, INH,
-        	    cpu -> {
-        	        cpu.setB(0x00);
-        	        cpu.updateFlagsCLR();
-        	    }
-        	);
-
-
 // NEG
         opcodes[0x00] = new Instruction("NEG", 0x00, 2, 6, DIR,
                 cpu -> {
@@ -848,9 +843,8 @@ public class CPU6809 {
         	    });
 
 
-        // 3. LOGIC
-
-        //   ANDA 
+        
+        // ANDA 
         opcodes[0x84] = new Instruction("ANDA", 0x84, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -885,7 +879,7 @@ public class CPU6809 {
         	    });
     
 
-        //     ANDB 
+        // ANDB
         opcodes[0xC4] = new Instruction("ANDB", 0xC4, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -919,7 +913,7 @@ public class CPU6809 {
         	    });
 
 
-        //   ORA 
+        // ORA 
         opcodes[0x8A] = new Instruction("ORA", 0x8A, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -945,7 +939,7 @@ public class CPU6809 {
         	        cpu.updateFlagsLogic(r);
         	    });
 
-        //   ORB 
+        //  ORB 
         opcodes[0xCA] = new Instruction("ORB", 0xCA, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -978,7 +972,7 @@ public class CPU6809 {
         	        cpu.updateFlagsLogic(r);
         	    });
 
-        //  EORA 
+        // EORA 
         opcodes[0x88] = new Instruction("EORA", 0x88, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -987,7 +981,7 @@ public class CPU6809 {
                     cpu.updateFlagsLogic(r);
                 });
 
-        //   EORB 
+        //  EORB 
         opcodes[0xC8] = new Instruction("EORB", 0xC8, 2, 2, IM8,
                 cpu -> {
                     int v = cpu.imm8();
@@ -1020,7 +1014,7 @@ public class CPU6809 {
         	        cpu.updateFlagsLogic(r);
         	    });
 
-        // 4. BRANCH / JMP / CALL
+     //JUMP
 
       
         opcodes[0x7E] = new Instruction("JMP", 0x7E, 3, 3, EXT,
@@ -1066,7 +1060,7 @@ public class CPU6809 {
                 });
    
 
-        // 5. STACK OPERATIONS
+        
 
         // PSHS
         opcodes[0x34] = new Instruction("PSHS", 0x34, 2, 5, IM8,
@@ -1124,14 +1118,14 @@ public class CPU6809 {
                     if ((mask & 0x80) != 0) cpu.setPC(cpu.pop16U());
                 });
 
-        // 6. OTHER
+       
 
         opcodes[0x12] = new Instruction("NOP", 0x12, 1, 2, INH,
-                cpu -> { /* ne fait rien */ });
+                cpu -> { });
     }
 
-    // Exécution d'une instruction 
-
+    
+   //execution
     public  void step() {
         int opcode = fetch8();
         Instruction instr = opcodes[opcode & 0xFF];
@@ -1145,16 +1139,16 @@ public class CPU6809 {
         instr.execute(this);
         cycles += instr.getCycles();
     }
-    /*  <<< PLACE LE ICI >>>  */
+  
     public boolean stepWithDebugger(Debugger dbg) {
 
         int currentPC = getPC();
 
-        // Breakpoint ?
+        // Point d'arret 
         if (dbg != null && dbg.isBreakpoint(currentPC)) {
             System.out.println(String.format("Arrêt sur breakpoint @ %04X", currentPC));
             dbg.dumpRegisters();
-            return false; // STOP execution
+            return false; 
         }
 
         int opcode = fetch8();
@@ -1167,15 +1161,13 @@ public class CPU6809 {
             );
         }
 
-        // Log simple vers la console
+        // Log vers la console
         System.out.println(String.format("EXEC @ %04X : %s", 
                  currentPC, instr.getMnemonic()));
+                 instr.execute(this);
+                  cycles += instr.getCycles();
 
-        // Exécuter l'instruction
-        instr.execute(this);
-        cycles += instr.getCycles();
-
-        // Montrer les registres après exécution
+        //registres après exécution
         if (dbg != null) dbg.dumpRegisters();
 
         return true; // continue execution
