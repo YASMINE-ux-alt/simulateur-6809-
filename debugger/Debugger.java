@@ -47,7 +47,7 @@ public class Debugger {
     public void step() {
         int pc = cpu.getPC();
         if (isBreakpoint(pc)) {
-            System.out.println("⚠ Breakpoint atteint @ " + hex(pc));
+            System.out.println(" Breakpoint atteint @ " + hex(pc));
             dumpRegisters();
             return;
         }
@@ -148,5 +148,6 @@ public class Debugger {
         return String.format("%02X", v & 0xFF);
     }
 }
+
 
 
